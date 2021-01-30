@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Omat tiedot{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form action="/profile" method="post">
+Käyttäjätunnus: <input type="text" name="username" value={{username}}>
+<p>
+Salasana: <input type="password" name="password">
+<p>
+<input type="submit" value="Tallenna">
+</form>{% endblock %}
+
+

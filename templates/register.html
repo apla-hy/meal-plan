@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Luo käyttäjätunnus{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form action="/register" method="post">
+Käyttäjätunnus: <input type="text" name="username">
+<p>
+Salasana: <input type="password" name="password">
+<p>
+<input type="submit" value="Luo käyttäjätunnus">
+</form>
+{% endblock %}
+

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Ruokalista{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+<tr>
+<td>
+<form action="/plan_change_date" method="post">
+<label>Aloituspäivä</label>
+<input type="date" name="startdate" value={{ startdate }}>
+<input type="submit" value="Vaihda aloituspäivä">
+<input type="hidden" name="plan_id" value="{{ plan_id }}">
+</form>
+</td>
+<td>
+<form action="/plan_change_period" method="post">
+<label>Suunnittelujakso</label>
+<input type="number" name="period" value={{ period }}>
+<input type="submit" value="Vaihda suunnittelujakso">
+<input type="hidden" name="plan_id" value="{{ plan_id }}">
+</form>
+</td>
+</tr>
+</table>
+
+<br>
+
+<datalist id="recipes">
+{% for recipe in recipes %}
+<option>{{ recipe }}</option>
+{% endfor %}
+</datalist>
+
+<table>
+  <tr>
+    <th>Päivä</th>
+    <th>Viikonpäivä</th>
+    <th>Lounas</th>
+    <th>Päivällinen</th>
+    <th>Lisäruoka</th>
+  </tr>
+
+
+{% for i in range(period) %}
+<tr>
+<td>{{ dates[i] }}</td>
+<td>{{ weekdays[i] }}</td>
+{% for j in range(3) %}
+<td><input type="text" id="{{ i }}_{{ j }}" list="recipes" /></td>
+{% endfor %}
+<tr>
+{% endfor %}
+</table>
+
+{% endblock %}
+
+

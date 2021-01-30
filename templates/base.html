@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<title>{% block title %}{% endblock %} - Ruokasuunnittelu</title>
+
+
+<body>
+
+<nav>
+<a href="/">Ruokasuunnittelu</a> |
+{% if session.user_id %}
+  <a href="/profile">Omat tiedot - {{ username }}</a> |
+  <a href="/logout">Kirjaudu ulos</a>
+{% else %}
+    <a href="/login">Kirjaudu sisään</a>
+{% endif %}
+</nav>
+
+<section class="content">
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+  {% block content %}{% endblock %}
+</section>
+
+</body>
+</html>

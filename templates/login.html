@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Kirjaudu sisään{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form action="/login" method="post">
+Käyttäjätunnus: <input type="text" name="username" autofocus>
+<p>
+Salasana: <input type="password" name="password">
+<p>
+<input type="submit" value="Kirjaudu">
+</form>
+Jos sinulla ei ole tunnusta, voit luoda uuden tunnuksen <a href="/register">tästä</a>{% endblock %}
+
+
+
+
+
