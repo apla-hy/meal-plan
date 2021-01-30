@@ -4,7 +4,9 @@ Tämä sovellus toteutetaan Helsingin yliopiston aineopintojen *Tietokantasovell
 
 ## Sovelluksen toiminnallisuus
 
-Sovelluksella voi suunnitella kotona valmistettavat ateriat haluamalleen aikavälille esimerkiksi yhden viikon ajaksi. Sovelluksessa on tallennettuna ruokareseptejä ja niihin liittyvät raaka-aineet nimikkeinä. Lisäksi sovelluksessa on muita nimikkeitä, joita yleisesti ostetaan ruokakaupoista. Suunnitteluaikavälin päiville valitaan valmistettavat ateriat alasvetovalikosta. Samalle päivälle voidaan valita useita aterioita kuten lounas ja päivällinen.
+Sovelluksella voi suunnitella kotona valmistettavat ateriat haluamalleen aikavälille esimerkiksi yhden viikon ajaksi. Sovelluksessa on tallennettuna ruokareseptejä ja niihin liittyvät raaka-aineet nimikkeinä. Lisäksi sovelluksessa on muita nimikkeitä, joita yleisesti ostetaan ruokakaupoista. Kaikki nimikkeet tallennetaan samaan tietokantatauluun.
+
+Suunnitteluaikavälin päiville valitaan valmistettavat ateriat alasvetovalikosta. Samalle päivälle voidaan valita useita aterioita kuten lounas ja päivällinen.
 
 Sovelluksella voidaan luoda suunnitelman perusteella ostoslista ruokakauppaan. Nimikkeet eli ostettavat tuotteet ovat listalla sopivassa järjestyksessä, jotta kaupassa käynti tai verkosta tilaaminen onnistuu helposti.
 
