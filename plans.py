@@ -9,7 +9,7 @@ def create_default_plan(user_id):
     plan_id = result.fetchone()
     # If not, create default plan
     if plan_id == None:
-        date_today = datetime.date.today().strftime("%d.%m.%Y")
+        date_today = datetime.date.today().strftime("%Y-%m-%d")
         sql = "INSERT INTO plans (user_id, default_plan, startdate, period) VALUES (:user_id,1, :date_today, 7)"
         db.session.execute(sql, {"user_id":user_id, "date_today":date_today})
         db.session.commit()
