@@ -53,7 +53,7 @@
 <td>{{ dates[i] }}</td>
 <td>{{ weekdays[i] }}</td>
 {% for j in range(3) %}
-<td><input type="text" name="{{ i }}_{{ j }}" list="recipes" /></td>
+<td><input type="text" name="{{ i }}_{{ j }}" list="recipes" value="{{ selected_recipes[i][j] }}" /></td>
 {% endfor %}
 <td><input type="text" name="{{ i }}_notes" value="{{ notes[i] }}" /></td>
 <tr>

@@ -1,6 +1,7 @@
 from db import db
 from flask import session
 import datetime
+import recipes
 
 def create_default_plan(user_id):
     # Check if there is a default plan already
@@ -66,14 +67,33 @@ def get_notes(plan_id):
         sql = "SELECT notes FROM plan_rows WHERE plan_id=:plan_id AND plan_row_date=:plan_row_date"
         result = db.session.execute(sql, {"plan_id":plan_id, "plan_row_date":plan_row_date})
         notes = result.fetchone()
-        print(notes)
         if notes == None:
-            print("Ei riviä")
             notes_list.append("")
         else:
-            print("Rivi löytyi")
             notes_list.append(notes[0])
     return notes_list
+
+def get_selected_recipes(plan_id):
+    startdate = get_startdate(plan_id)
+    period = get_period(plan_id)
+    selected_recipes_list = [None] * period 
+    for i in range(period):
+        selected_recipes_list[i] = [""] * 3
+
+    for i in range(period):
+        recipe_list = recipes.get_recipes()
+        plan_row_date = startdate + datetime.timedelta(days=i)
+        sql = "SELECT recipe_0, recipe_1, recipe_2 FROM plan_rows WHERE plan_id=:plan_id AND plan_row_date=:plan_row_date"
+        result = db.session.execute(sql, {"plan_id":plan_id, "plan_row_date":plan_row_date})
+        recipe = result.fetchone()
+        if recipe != None:
+            for j in range(3):
+                for k in range(len(recipe_list)):
+                    if recipe_list[k][1] == recipe[j]:
+                        selected_recipes_list[i][j] = recipe_list[k][0]
+
+    return selected_recipes_list
+
 
 def save_row(plan_id, startdate, plan_row_number, recipes, notes):
 

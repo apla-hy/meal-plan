@@ -26,10 +26,11 @@ def plan():
     for planning_date in planning_dates:
         weekdays.append(plans.get_weekday(planning_date.weekday()))
         dates.append(planning_date.strftime("%d.%m.%Y"))
-    recipe_list = recipes.get_recipes()
+    recipe_list = recipes.get_recipe_names()
     notes = plans.get_notes(plan_id)
+    selected_recipes = plans.get_selected_recipes(plan_id)
 
-    return render_template("plan.html", username=username, plan_id=plan_id, startdate=startdate, period=period, dates=dates, weekdays=weekdays, recipes=recipe_list, notes=notes)
+    return render_template("plan.html", username=username, plan_id=plan_id, startdate=startdate, period=period, dates=dates, weekdays=weekdays, recipes=recipe_list, selected_recipes=selected_recipes, notes=notes)
 
 @app.route("/plan_change_date", methods=["post"])
 def plan_change_date():
