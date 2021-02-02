@@ -27,8 +27,9 @@ def plan():
         weekdays.append(plans.get_weekday(planning_date.weekday()))
         dates.append(planning_date.strftime("%d.%m.%Y"))
     recipe_list = recipes.get_recipes()
+    notes = plans.get_notes(plan_id)
 
-    return render_template("plan.html", username=username, plan_id=plan_id, startdate=startdate, period=period, dates=dates, weekdays=weekdays, recipes=recipe_list)
+    return render_template("plan.html", username=username, plan_id=plan_id, startdate=startdate, period=period, dates=dates, weekdays=weekdays, recipes=recipe_list, notes=notes)
 
 @app.route("/plan_change_date", methods=["post"])
 def plan_change_date():

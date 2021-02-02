@@ -57,6 +57,24 @@ def get_weekday(weekday_index):
     weekdays = ["maanantai", "tiistai", "keskiviikko", "torstai", "perjantai", "lauantai", "sunnuntai"]
     return weekdays[weekday_index]
 
+def get_notes(plan_id):
+    startdate = get_startdate(plan_id)
+    period = get_period(plan_id)
+    notes_list = []
+    for i in range(period):
+        plan_row_date = startdate + datetime.timedelta(days=i)
+        sql = "SELECT notes FROM plan_rows WHERE plan_id=:plan_id AND plan_row_date=:plan_row_date"
+        result = db.session.execute(sql, {"plan_id":plan_id, "plan_row_date":plan_row_date})
+        notes = result.fetchone()
+        print(notes)
+        if notes == None:
+            print("Ei riviä")
+            notes_list.append("")
+        else:
+            print("Rivi löytyi")
+            notes_list.append(notes[0])
+    return notes_list
+
 def save_row(plan_id, startdate, plan_row_number, recipes, notes):
 
     # Find ids for selected recipes
