@@ -56,3 +56,38 @@ def get_planning_dates(startdate, period):
 def get_weekday(weekday_index):
     weekdays = ["maanantai", "tiistai", "keskiviikko", "torstai", "perjantai", "lauantai", "sunnuntai"]
     return weekdays[weekday_index]
+
+def save_row(plan_id, startdate, plan_row_number, recipes, notes):
+
+    # Find ids for selected recipes
+    recipe_ids = [0] * len(recipes)
+    sql = "SELECT id FROM recipes WHERE name=:name"
+    for i in range(len(recipe_ids)):
+        result = db.session.execute(sql, {"name":recipes[i]})
+        recipe_id = result.fetchone()
+        if recipe_id == None:
+            print("Virhe: valitun aterian reseptiä ei löydy")
+            return False
+        else:
+            recipe_ids[i] = recipe_id[0]
+
+    # Check if there is a plan row with this date already
+    plan_row_date = startdate + datetime.timedelta(days=plan_row_number)
+    plan_row_date = plan_row_date.strftime("%Y-%m-%d")
+    sql = "SELECT id FROM plan_rows WHERE plan_id=:plan_id AND plan_row_date=:plan_row_date"
+    result = db.session.execute(sql, {"plan_id":plan_id, "plan_row_date":plan_row_date})
+    plan_row_id = result.fetchone()
+
+    # Insert or update plan row data to the database
+    if plan_row_id == None:
+        sql = "INSERT INTO plan_rows (plan_id, plan_row_date, recipe_0, recipe_1, recipe_2, notes) VALUES (:plan_id, :plan_row_date, :recipe_0, :recipe_1, :recipe_2, :notes)"
+    else:
+        sql = "UPDATE plan_rows SET recipe_0=:recipe_0, recipe_1=:recipe_1, recipe_2=:recipe_2, notes=:notes WHERE plan_id=:plan_id AND plan_row_date=:plan_row_date"
+    
+    db.session.execute(sql, {"plan_id":plan_id, "plan_row_date":plan_row_date, "recipe_0":recipe_ids[0], "recipe_1":recipe_ids[1], "recipe_2":recipe_ids[2], "notes":notes})
+    db.session.commit()
+
+    return True
+
+
+  

@@ -46,6 +46,22 @@ def plan_change_period():
 
     return redirect("/plan")
 
+@app.route("/plan_save_rows", methods=["post"])
+def plan_save_rows():
+    plan_id = request.form["plan_id"]
+    startdate = plans.get_startdate(plan_id)
+    period = plans.get_period(plan_id)
+    
+    for i in range(period):
+        plan_row_number = i
+        recipes = []
+        for j in range(3):
+            recipes.append(request.form[str(i) + "_" + str(j)])
+        notes = request.form[str(i) + "_notes"]
+        plans.save_row(plan_id, startdate, plan_row_number, recipes, notes)        
+
+    return redirect("/plan")
+
 
 
 @app.route("/login", methods=["get","post"])

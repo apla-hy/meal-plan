@@ -35,6 +35,8 @@
 {% endfor %}
 </datalist>
 
+<form name=form_rows action="/plan_save_rows" method="post">
+
 <table>
   <tr>
     <th>Päivä</th>
@@ -42,6 +44,7 @@
     <th>Lounas</th>
     <th>Päivällinen</th>
     <th>Lisäruoka</th>
+    <th>Muistiinpanot</th>
   </tr>
 
 
@@ -50,11 +53,19 @@
 <td>{{ dates[i] }}</td>
 <td>{{ weekdays[i] }}</td>
 {% for j in range(3) %}
-<td><input type="text" id="{{ i }}_{{ j }}" list="recipes" /></td>
+<td><input type="text" name="{{ i }}_{{ j }}" list="recipes" /></td>
 {% endfor %}
+<td><input type="text" name="{{ i }}_notes"/></td>
 <tr>
 {% endfor %}
 </table>
+
+<br>
+
+<input type="hidden" name="plan_id" value="{{ plan_id }}">
+<input type="submit" value="Tallenna suunnitelma">
+<button type="submit" formaction="/plan_create_shopping_list">Luo ostoslista</button>
+</form>
 
 {% endblock %}
 
