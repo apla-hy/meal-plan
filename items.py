@@ -8,15 +8,27 @@ def item_search(query):
     return items
 
 def get_item(item_id):
-    sql = "SELECT id, name, class FROM items WHERE id=:item_id"
+    sql = "SELECT I.id, I.name, I.class_id, IC.name AS class_name FROM items I LEFT JOIN item_classes IC ON I.class_id=IC.id WHERE I.id=:item_id"
     result = db.session.execute(sql, {"item_id":item_id})
     item = result.fetchone()
     return item
 
+def get_class_names():
+    sql = "SELECT name FROM item_classes ORDER BY name"
+    result = db.session.execute(sql)
+    item_classes = result.fetchall()
+    class_list = []
+    for item_class in item_classes:
+        class_list.append(item_class[0])
+    return class_list
 
 def item_change(item_id, item_name, item_class):
-    sql = "UPDATE items SET name=:name, class=:class WHERE id=:id"
-    db.session.execute(sql, {"id":item_id, "name":item_name, "class":item_class})
+    sql = "SELECT id FROM item_classes WHERE name=:item_class"
+    result = db.session.execute(sql, {"item_class":item_class})
+    item_class_id = result.fetchone()[0]
+
+    sql = "UPDATE items SET name=:name, class_id=:class_id WHERE id=:id"
+    db.session.execute(sql, {"id":item_id, "name":item_name, "class_id":item_class_id})
     db.session.commit()
 
     return True    

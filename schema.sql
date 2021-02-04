@@ -27,9 +27,15 @@ CREATE TABLE plan_rows (
     notes TEXT
 );
 
+CREATE TABLE item_classes (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE
+);
+
+
 CREATE TABLE items (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE,
-    class TEXT
+    class_id INTEGER REFERENCES item_classes,
+    name TEXT UNIQUE
 );
 

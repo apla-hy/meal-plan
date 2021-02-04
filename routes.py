@@ -122,8 +122,9 @@ def item_modify(id):
     item_id = id
     item = items.get_item(item_id)
     item_name = item[1]
-    item_class = item[2]
-    return render_template("item_details.html", item_id=item_id, item_name=item_name, item_class=item_class)
+    item_class = item[3]
+    class_list = items.get_class_names()
+    return render_template("item_details.html", item_id=item_id, item_name=item_name, item_class=item_class, class_list=class_list, number_of_classes=len(class_list))
 
 @app.route("/item_save", methods=["post"])
 def item_save():
