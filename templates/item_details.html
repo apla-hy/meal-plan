@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Nimikkeen muokkaus{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form action="/item_save" method="post">
+
+<table>
+<tr>
+<td>Nimike:</td><td><input type="text" name="item_name" value={{item_name}}></td>
+</tr>
+<tr>
+<td>Luokka:</td><td><input type="text" name="item_class" value={{item_class}}></td>
+</tr>
+</table>
+
+<br>
+
+<input type="hidden" name="item_id" value={{item_id}}>
+<input type="submit" value="Tallenna">
+
+</form>{% endblock %}
+

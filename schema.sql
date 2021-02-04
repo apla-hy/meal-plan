@@ -27,3 +27,9 @@ CREATE TABLE plan_rows (
     notes TEXT
 );
 
+CREATE TABLE items (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE,
+    class TEXT
+);
+

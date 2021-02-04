@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Nimikkeet{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+<tr>
+<td>
+<form action="/item" method="get">
+<label>Hae nimikkeitä</label>
+<input type="text" name="query">
+<input type="submit" value="Hae">
+</form>
+</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>Nimike</th>
+  </tr>
+
+{% for i in range(number_of_items) %}
+<tr>
+<td><a href="/item_details/{{ items[i][0] }}">{{ items[i][1] }}</a></td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+
+{% endblock %}
+
+

@@ -3,6 +3,7 @@ from flask import render_template, request, redirect
 import users
 import plans
 import recipes
+import items
 
 @app.route("/")
 def index():
@@ -107,4 +108,29 @@ def profile():
             return redirect("/")
         else:
             return render_template("error.html",message="Tietojen tallannus ei onnistunut")
+
+@app.route("/item", methods=["get"])
+def item():
+    query = request.args.get("query")
+    if query == None:
+        query = ''
+    item_list = items.item_search(query)
+    return render_template("item.html",items=item_list, number_of_items=len(item_list))
+
+@app.route("/item_details/<int:id>", methods=["get"])
+def item_modify(id):
+    item_id = id
+    item = items.get_item(item_id)
+    item_name = item[1]
+    item_class = item[2]
+    return render_template("item_details.html", item_id=item_id, item_name=item_name, item_class=item_class)
+
+@app.route("/item_save", methods=["post"])
+def item_save():
+    item_id = request.form["item_id"]
+    item_name = request.form["item_name"]
+    item_class = request.form["item_class"]
+    items.item_change(item_id, item_name, item_class)
+
+    return redirect("/item_details/"+str(item_id))
 
