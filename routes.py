@@ -7,16 +7,21 @@ import items
 
 @app.route("/")
 def index():
-    username = users.get_username()
-    if username:
+    user_id = users.get_user_id()
+    if user_id:
         return redirect("/plan")
     else:
         return render_template("index.html")
 
 @app.route("/plan")
 def plan():
-    username = users.get_username()
+
+    # Check that there is an active session
     user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
     plans.create_default_plan(user_id)
     plan_id = plans.get_default_plan_id(user_id)
     startdate = plans.get_startdate(plan_id)
@@ -35,22 +40,39 @@ def plan():
 
 @app.route("/plan_change_date", methods=["post"])
 def plan_change_date():
-    startdate = request.form["startdate"]
-    plan_id = request.form["plan_id"]
-    plans.set_startdate(plan_id, startdate)
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    # Change the start date
+    plans.set_startdate(request.form["plan_id"], request.form["startdate"])
 
     return redirect("/plan")
 
 @app.route("/plan_change_period", methods=["post"])
 def plan_change_period():
-    period = request.form["period"]
-    plan_id = request.form["plan_id"]
-    plans.set_period(plan_id, period)
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    # Change pediod
+    plans.set_period(request.form["plan_id"], request.form["period"])
 
     return redirect("/plan")
 
 @app.route("/plan_save_rows", methods=["post"])
 def plan_save_rows():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    # Save rows
     plan_id = request.form["plan_id"]
     startdate = plans.get_startdate(plan_id)
     period = plans.get_period(plan_id)
@@ -98,7 +120,13 @@ def register():
 
 @app.route("/profile", methods=["get","post"])
 def profile():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
     username = users.get_username()
+
     if request.method == "GET":
         return render_template("profile.html",username=username)
     if request.method == "POST":
@@ -107,27 +135,47 @@ def profile():
         if users.update_profile(username,password):
             return redirect("/")
         else:
-            return render_template("error.html",message="Tietojen tallannus ei onnistunut")
+            return render_template("error.html",username=username, message="Tietojen tallannus ei onnistunut")
 
 @app.route("/item", methods=["get"])
 def item():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
     query = request.args.get("query")
     if query == None:
         query = ''
     item_list = items.item_search(query)
-    return render_template("item.html",items=item_list, number_of_items=len(item_list))
+    return render_template("item.html",username=username, items=item_list, number_of_items=len(item_list))
 
 @app.route("/item_details/<int:id>", methods=["get"])
 def item_modify(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
     item_id = id
     item = items.get_item(item_id)
     item_name = item[1]
     item_class = item[3]
     class_list = items.get_class_names()
-    return render_template("item_details.html", item_id=item_id, item_name=item_name, item_class=item_class, class_list=class_list, number_of_classes=len(class_list))
+    return render_template("item_details.html", username=username, item_id=item_id, item_name=item_name, item_class=item_class, class_list=class_list, number_of_classes=len(class_list))
 
 @app.route("/item_save", methods=["post"])
 def item_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
     item_id = request.form["item_id"]
     item_name = request.form["item_name"]
     item_class = request.form["item_class"]
