@@ -30,7 +30,10 @@
 
 <table>
 <tr>
-<td><label>Resepti:</label></td><td><input type="text" name="recipe_name" value="{{recipe_name}}"></td>
+<td><label>Resepti:</label></td>
+<td>
+<input type="text" name="recipe_name" value="{{recipe_name}}">
+</td>
 </tr>
 </table>
 
@@ -44,6 +47,9 @@
 
 
 <table>
+<tr>
+<th></th><th></th><th><label>Aines</label></th><th><label>Määrä</label></th>
+</tr>
 {% for i in range(number_of_rows) %}
 <tr>
 <td><input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}></td>
@@ -52,12 +58,11 @@
 <input type="checkbox" name="{{i}}_selected" form="form_delete" value={{row_ids[i]}}>
 </td>
 
-<td>Aines:</td><td>
+<td>
 <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}" />
 </td>
 
-
-<td>Määrä:</td><td><input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"></td></td>
+<td><input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"></td></td>
 {% endfor %}
 </tr>
 </table>

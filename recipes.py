@@ -34,11 +34,14 @@ def get_recipe_rows(recipe_id):
     return recipe_rows
 
 def save_header(recipe_id, recipe_name):
-    sql = "UPDATE recipes SET name=:name WHERE id=:recipe_id"
-    db.session.execute(sql, {"recipe_id":recipe_id, "name":recipe_name})
-    db.session.commit()
-
+    try:
+        sql = "UPDATE recipes SET name=:name WHERE id=:recipe_id"
+        db.session.execute(sql, {"recipe_id":recipe_id, "name":recipe_name})
+        db.session.commit()
+    except:
+        return False
     return True
+        
 
 def save_row(row_id, item_name, amount):
 
@@ -61,11 +64,12 @@ def save_row(row_id, item_name, amount):
     return True
 
 def new_row(recipe_id):
-    sql = "INSERT INTO recipe_rows (recipe_id, item_id, amount) VALUES (:recipe_id, 1, '')"
-    db.session.execute(sql, {"recipe_id":recipe_id})
+    sql = "INSERT INTO recipe_rows (recipe_id, item_id, amount) VALUES (:recipe_id, 1, '') RETURNING id"
+    result = db.session.execute(sql, {"recipe_id":recipe_id})
+    row_id = result.fetchone()[0]
     db.session.commit()
 
-    return True
+    return row_id
 
 def delete_row(row_id):
     sql = "DELETE FROM recipe_rows WHERE id=:row_id"

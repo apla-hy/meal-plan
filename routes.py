@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, session, flash
 import users
 import plans
 import recipes
@@ -150,7 +150,8 @@ def item():
     if query == None:
         query = ''
     item_list = items.item_search(query)
-    return render_template("item.html",username=username, items=item_list, number_of_items=len(item_list))
+
+    return render_template("item.html", username=username, items=item_list, number_of_items=len(item_list))
 
 @app.route("/item_details/<int:id>", methods=["get"])
 def item_modify(id):
@@ -166,6 +167,7 @@ def item_modify(id):
     item_name = item[1]
     item_class = item[3]
     class_list = items.get_class_names()
+
     return render_template("item_details.html", username=username, item_id=item_id, item_name=item_name, item_class=item_class, class_list=class_list, number_of_classes=len(class_list))
 
 @app.route("/item_save", methods=["post"])
@@ -223,6 +225,7 @@ def recipe():
     if query == None:
         query = ''
     recipe_list = recipes.recipe_search(query)
+
     return render_template("recipe.html",username=username, recipes=recipe_list, number_of_recipes=len(recipe_list))
 
 
@@ -235,6 +238,7 @@ def recipe_details(id):
         return redirect("/")
     username = users.get_username()
 
+    # Get recipe data from the database
     recipe_id = id
     recipe = recipes.get_recipe(recipe_id)
     recipe_name = recipe[1]
@@ -248,6 +252,19 @@ def recipe_details(id):
         row_amounts.append(recipe_row[3])
     item_list = items.get_item_names()
 
+    # If session contains recipe data, use it (there was an error in saving this data)
+    if "recipe_name" in session:
+        recipe_name = session["recipe_name"]
+        del session["recipe_name"]
+
+    if "recipe_rows" in session:
+        for recipe_row in session["recipe_rows"]:
+            index = row_ids.index(int(recipe_row[0]))
+            row_ids[index] = recipe_row[0]
+            row_names[index] = recipe_row[1]
+            row_amounts[index] = recipe_row[2]
+        del session["recipe_rows"]
+
     return render_template("recipe_details.html", username=username, recipe_id=recipe_id, recipe_name=recipe_name, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
 
 @app.route("/recipe_save", methods=["post"])
@@ -258,18 +275,32 @@ def recipe_save():
     if not user_id:
         return redirect("/")
 
+    error = False
+
     # Save header
     recipe_id = request.form["recipe_id"]
     recipe_name = request.form["recipe_name"]
-    recipes.save_header(recipe_id, recipe_name)    
+    if not recipes.save_header(recipe_id, recipe_name):
+        error = True
+        session["recipe_name"] = recipe_name
+        flash("Reseptin nimen tallentaminen ei onnistunut")
 
     # Save rows
+    error_rows = []
     number_of_rows = int(request.form["number_of_rows"])
     for i in range(number_of_rows):
         row_id = request.form[str(i) + "_row_id"]
         item_name = request.form[str(i) + "_row_name"]
         amount = request.form[str(i) + "_row_amount"]
-        recipes.save_row(row_id, item_name, amount)        
+        if not recipes.save_row(row_id, item_name, amount):
+            error = True
+            error_rows.append([row_id, item_name, amount])
+            flash("Rivin " + item_name + " tallentaminen ei onnistunut")
+    if len(error_rows) > 0:
+        session["recipe_rows"] = error_rows
+
+    if not error:
+        flash("Resepti tallennettu")
 
     return redirect("/recipe_details/"+str(recipe_id))
 
@@ -282,7 +313,7 @@ def recipe_add_row():
         return redirect("/")
 
     recipe_id = request.form["recipe_id"]
-    recipes.new_row(recipe_id)
+    row_id = recipes.new_row(recipe_id)
 
     return redirect("/recipe_details/"+str(recipe_id))
 
