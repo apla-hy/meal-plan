@@ -12,9 +12,27 @@ CREATE TABLE plans (
     period INTEGER
 );
 
+CREATE TABLE item_classes (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE
+);
+
+CREATE TABLE items (
+    id SERIAL PRIMARY KEY,
+    class_id INTEGER REFERENCES item_classes,
+    name TEXT UNIQUE
+);
+
 CREATE TABLE recipes (
     id SERIAL PRIMARY KEY,
     name TEXT UNIQUE
+);
+
+CREATE TABLE recipe_rows (
+    id SERIAL PRIMARY KEY,
+    recipe_id INTEGER REFERENCES recipes,
+    item_id INTEGER REFERENCES items,
+    amount TEXT
 );
 
 CREATE TABLE plan_rows (
@@ -27,15 +45,4 @@ CREATE TABLE plan_rows (
     notes TEXT
 );
 
-CREATE TABLE item_classes (
-    id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE
-);
-
-
-CREATE TABLE items (
-    id SERIAL PRIMARY KEY,
-    class_id INTEGER REFERENCES item_classes,
-    name TEXT UNIQUE
-);
 

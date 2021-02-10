@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Reseptit{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+<tr>
+<td>
+<form action="/recipe" method="get">
+<label>Hae reseptejä</label>
+<input type="text" name="query">
+<input type="submit" value="Hae">
+</form>
+</td>
+<td>
+<form action="/recipe_new" method="get">
+<input type="submit" value="Lisää uusi resepti">
+</td>
+</form>
+
+</tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>Resepti</th>
+  </tr>
+
+{% for i in range(number_of_recipes) %}
+<tr>
+<td><a href="/recipe_details/{{ recipes[i][0] }}">{{ recipes[i][1] }}</a></td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+
+{% endblock %}
+
+

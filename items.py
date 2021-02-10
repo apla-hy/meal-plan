@@ -2,7 +2,7 @@ from db import db
 from flask import session
 
 def item_search(query):
-    sql = "SELECT id, name FROM items WHERE name LIKE :query ORDER BY name"
+    sql = "SELECT id, name FROM items WHERE LOWER(name) LIKE LOWER(:query) ORDER BY name"
     result = db.session.execute(sql, {"query":"%"+query+"%"})
     items = result.fetchall()
     return items
@@ -12,6 +12,16 @@ def get_item(item_id):
     result = db.session.execute(sql, {"item_id":item_id})
     item = result.fetchone()
     return item
+
+def get_item_names():
+    sql = "SELECT name FROM items"
+    result = db.session.execute(sql)
+    item_names = result.fetchall()
+    name_list = []
+    for name in item_names:
+        name_list.append(name[0])
+    return name_list
+
 
 def get_class_names():
     sql = "SELECT name FROM item_classes ORDER BY name"
@@ -32,3 +42,16 @@ def item_change(item_id, item_name, item_class):
     db.session.commit()
 
     return True    
+
+def item_new(item_name, item_class):
+    sql = "SELECT id FROM item_classes WHERE name=:item_class"
+    result = db.session.execute(sql, {"item_class":item_class})
+    item_class_id = result.fetchone()[0]
+
+    sql = "INSERT INTO items (name, class_id) VALUES (:name, :class_id) RETURNING id"
+    result = db.session.execute(sql, {"name":item_name, "class_id":item_class_id})
+    item_id = result.fetchone()[0]
+    db.session.commit()
+
+    return item_id
+

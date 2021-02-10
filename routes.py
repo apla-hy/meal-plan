@@ -183,3 +183,125 @@ def item_save():
 
     return redirect("/item_details/"+str(item_id))
 
+@app.route("/item_new", methods=["get"])
+def item_new():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    class_list = items.get_class_names()
+
+    return render_template("item_new.html", username=username, class_list=class_list, number_of_classes=len(class_list))
+
+@app.route("/item_new_save", methods=["post"])
+def item_new_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    item_name = request.form["item_name"]
+    item_class = request.form["item_class"]
+    item_id = items.item_new(item_name, item_class)
+
+    return redirect("/item_new")
+
+@app.route("/recipe", methods=["get"])
+def recipe():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    query = request.args.get("query")
+    if query == None:
+        query = ''
+    recipe_list = recipes.recipe_search(query)
+    return render_template("recipe.html",username=username, recipes=recipe_list, number_of_recipes=len(recipe_list))
+
+
+@app.route("/recipe_details/<int:id>", methods=["get"])
+def recipe_details(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    recipe_id = id
+    recipe = recipes.get_recipe(recipe_id)
+    recipe_name = recipe[1]
+    recipe_rows = recipes.get_recipe_rows(recipe_id)
+    row_ids = []
+    row_names = []
+    row_amounts = []
+    for recipe_row in recipe_rows:
+        row_ids.append(recipe_row[0])
+        row_names.append(recipe_row[2])
+        row_amounts.append(recipe_row[3])
+    item_list = items.get_item_names()
+
+    return render_template("recipe_details.html", username=username, recipe_id=recipe_id, recipe_name=recipe_name, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
+
+@app.route("/recipe_save", methods=["post"])
+def recipe_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    # Save header
+    recipe_id = request.form["recipe_id"]
+    recipe_name = request.form["recipe_name"]
+    recipes.save_header(recipe_id, recipe_name)    
+
+    # Save rows
+    number_of_rows = int(request.form["number_of_rows"])
+    for i in range(number_of_rows):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        recipes.save_row(row_id, item_name, amount)        
+
+    return redirect("/recipe_details/"+str(recipe_id))
+
+@app.route("/recipe_add_row", methods=["post"])
+def recipe_add_row():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    recipe_id = request.form["recipe_id"]
+    recipes.new_row(recipe_id)
+
+    return redirect("/recipe_details/"+str(recipe_id))
+
+@app.route("/recipe_delete_row", methods=["post"])
+def recipe_delete_row():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+
+    recipe_id = request.form["recipe_id"]
+    number_of_rows = int(request.form["number_of_rows"])
+
+    # Loop all rows and delete the selected ones
+    for i in range(number_of_rows):
+        row_id = int(request.form.get(str(i) + "_selected", default='0'))
+        if row_id != 0:
+            recipes.delete_row(row_id)
+
+    return redirect("/recipe_details/"+str(recipe_id))
+
