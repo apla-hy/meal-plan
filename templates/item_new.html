@@ -5,6 +5,19 @@
 {% endblock %}
 
 {% block content %}
+{% if 'previous_page' in session %}
+  {% if session['previous_page'] == 'recipe' %}
+    <form action={{session['previous_page_url']}} method="get">
+      <input type="submit" value="Takaisin reseptin muokkaukseen">
+    </form>
+  {% endif %}
+  {% if session['previous_page'] == 'item' %}
+    <form action="/item" method="get">
+      <input type="submit" value="Takaisin nimikelistaan">
+    </form>
+  {% endif %}
+{% endif %}
+
 <form action="/item_new_save" method="post">
 
 <table>

@@ -7,70 +7,104 @@
 {% block content %}
 
 <table>
-<tr>
-<td>
-<form action="/recipe_add_row" method="post">
-<input type="hidden" name="recipe_id" value="{{ recipe_id }}">
-<input type="submit" value="Lisää rivi">
-</form>
-</td>
-<td>
-<form action="/recipe_delete_row" id="form_delete" method="post">
-<input type="submit" value="Poista valitut rivit">
-<input type="hidden" name="recipe_id" value="{{ recipe_id }}">
-<input type="hidden" name="number_of_rows" value="{{ number_of_rows }}">
-</form>
-</td>
-</tr>
+  <tr>
+    <td>
+      <form action="/recipe" method=get">
+        <input type="submit" value="Takaisin reseptilistaan">
+      </form>
+    </td>
+    <td>
+      <form action="/recipe_add_row" method="post">
+        <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+        <input type="submit" value="Lisää rivi">
+      </form>
+    </td>
+    <td>
+      <form action="/recipe_delete_row" id="form_selected_rows" method="post">
+        <input type="submit" value="Poista valitut rivit">
+        <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+        <input type="hidden" name="number_of_rows" value="{{ number_of_rows }}">
+      </form>
+    </td>
+    <td>
+      <form action="/item_new_from_recipe" method="get">
+        <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+        <input type="submit" value="Lisää uusi nimike">
+      </form>
+    </td>
+    <td>
+      <button type="submit" form="form_selected_rows" formaction="/item_modify_from_recipe">Muokkaa valitun rivin nimikettä</button>
+    </td>
+  </tr>
 </table>
 
 <br>
 
 <form action="/recipe_save" method="post">
+  <table>
+    <tr>
+      <td>
+        <label>Resepti:</label>
+      </td>
+      <td>
+        <input type="text" name="recipe_name" value="{{recipe_name}}">
+      </td>
+    </tr>
+  </table>
 
-<table>
-<tr>
-<td><label>Resepti:</label></td>
-<td>
-<input type="text" name="recipe_name" value="{{recipe_name}}">
-</td>
-</tr>
-</table>
+  <br>
 
-<br>
+  <datalist id="item_names">
+    {% for name in item_list %}
+      <option>{{ name }}</option>
+    {% endfor %}
+  </datalist>
 
-<datalist id="item_names">
-{% for name in item_list %}
-<option>{{ name }}</option>
-{% endfor %}
-</datalist>
+  <table>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>
+        <label>Aines</label>
+      </th>
+      <th>
+        <label>Määrä</label>
+      </th>
+    </tr>
+    {% for i in range(number_of_rows) %}
+      <tr>
+        <td>
+          <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
+        </td>
+        <td>
+          <input type="checkbox" name="{{i}}_selected" form="form_selected_rows" value={{row_ids[i]}}>
+        </td>
+        <td>
+          <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}" />
+        </td>
+        <td>
+          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}">
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
 
+  <br>
+  
+  <table>
+    <tr>
+      <td>
+        <input type="hidden" name="recipe_id" value={{recipe_id}}>
+        <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
+        <input type="submit" value="Tallenna">
+        </form>
+      </td>
+      <td>
+        <form action="/recipe_details/{{recipe_id}}" method="get">
+          <input type="submit" value="Peru tallentamattomat muutokset">
+        </form>
+      </td>
+    </tr>
+  </table>
 
-<table>
-<tr>
-<th></th><th></th><th><label>Aines</label></th><th><label>Määrä</label></th>
-</tr>
-{% for i in range(number_of_rows) %}
-<tr>
-<td><input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}></td>
-
-<td>
-<input type="checkbox" name="{{i}}_selected" form="form_delete" value={{row_ids[i]}}>
-</td>
-
-<td>
-<input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}" />
-</td>
-
-<td><input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"></td></td>
-{% endfor %}
-</tr>
-</table>
-
-<br>
-
-<input type="hidden" name="recipe_id" value={{recipe_id}}>
-<input type="hidden" name="number_of_rows" value={{number_of_rows}}>
-<input type="submit" value="Tallenna">
-
-</form>{% endblock %}
+{% endblock %}

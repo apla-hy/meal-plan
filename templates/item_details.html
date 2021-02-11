@@ -27,8 +27,19 @@
 
 <br>
 
+<table>
+  <tr>
+    <td>
+      <input type="hidden" name="item_id" value={{item_id}}>
+      <input type="submit" value="Tallenna">
+      </form>
+    </td>
+    <td>
+      <form action="/item_details/{{item_id}}" method="get">
+        <input type="submit" value="Peru tallentamattomat muutokset">
+      </form>
+    </td>
+  </tr>
+</table>
 
-<input type="hidden" name="item_id" value={{item_id}}>
-<input type="submit" value="Tallenna">
-
-</form>{% endblock %}
+{% endblock %}

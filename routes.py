@@ -146,6 +146,10 @@ def item():
         return redirect("/")
     username = users.get_username()
 
+    # Store this page to session history
+    session["previous_page"] = "item"
+    session["previous_page_url"] = "/item"
+
     query = request.args.get("query")
     if query == None:
         query = ''
@@ -197,6 +201,59 @@ def item_new():
     class_list = items.get_class_names()
 
     return render_template("item_new.html", username=username, class_list=class_list, number_of_classes=len(class_list))
+
+@app.route("/item_new_from_recipe", methods=["get"])
+def item_new_from_recipe():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Store recipe details page to session history
+    recipe_id = request.args.get("recipe_id")
+    if recipe != None:
+        session["previous_page"] = "recipe"
+        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
+
+    return redirect("/item_new")
+
+@app.route("/item_modify_from_recipe", methods=["post"])
+def item_modify_from_recipe():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    recipe_id = request.form["recipe_id"]
+    number_of_rows = int(request.form["number_of_rows"])
+    selected_row = 0
+
+    # Loop all rows and find the first selected row
+    for i in range(number_of_rows):
+        row_id = int(request.form.get(str(i) + "_selected", default='0'))
+        if row_id != 0:
+            selected_row = row_id
+            break
+    if selected_row == 0:
+        flash("Riviä ei ole valittu")
+        return redirect("/recipe_details/" + str(recipe_id))
+
+    # Store recipe details page to session history
+    if recipe != None:
+        session["previous_page"] = "recipe"
+        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
+
+    # Open item modify page
+    recipe_row = recipes.get_recipe_row(recipe_id, selected_row)
+    print(recipe_row)
+    item_id = recipe_row[1]
+
+    return redirect("/item_details/" + str(item_id))
+
 
 @app.route("/item_new_save", methods=["post"])
 def item_new_save():

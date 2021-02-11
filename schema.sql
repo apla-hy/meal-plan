@@ -20,7 +20,8 @@ CREATE TABLE item_classes (
 CREATE TABLE items (
     id SERIAL PRIMARY KEY,
     class_id INTEGER REFERENCES item_classes,
-    name TEXT UNIQUE
+    name TEXT UNIQUE,
+    default_item INTEGER
 );
 
 CREATE TABLE recipes (

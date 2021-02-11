@@ -1,5 +1,6 @@
 from db import db
 from flask import session
+import items
 
 def get_recipes():
     sql = "SELECT name, id FROM recipes ORDER BY id"
@@ -33,6 +34,13 @@ def get_recipe_rows(recipe_id):
     recipe_rows = result.fetchall()
     return recipe_rows
 
+def get_recipe_row(recipe_id, row_id):
+    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id WHERE RR.recipe_id=:recipe_id AND RR.id=:row_id ORDER BY RR.id"
+    result = db.session.execute(sql, {"recipe_id":recipe_id, "row_id":row_id})
+    recipe_row = result.fetchone()
+    return recipe_row
+
+
 def save_header(recipe_id, recipe_name):
     try:
         sql = "UPDATE recipes SET name=:name WHERE id=:recipe_id"
@@ -64,8 +72,9 @@ def save_row(row_id, item_name, amount):
     return True
 
 def new_row(recipe_id):
-    sql = "INSERT INTO recipe_rows (recipe_id, item_id, amount) VALUES (:recipe_id, 1, '') RETURNING id"
-    result = db.session.execute(sql, {"recipe_id":recipe_id})
+    item_id = items.get_default_item_id()
+    sql = "INSERT INTO recipe_rows (recipe_id, item_id, amount) VALUES (:recipe_id, :item_id, '') RETURNING id"
+    result = db.session.execute(sql, {"recipe_id":recipe_id, "item_id":item_id})
     row_id = result.fetchone()[0]
     db.session.commit()
 
