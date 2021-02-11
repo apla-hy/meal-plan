@@ -238,6 +238,8 @@ def item_modify_from_recipe():
         if row_id != 0:
             selected_row = row_id
             break
+
+    # No row selected
     if selected_row == 0:
         flash("Riviä ei ole valittu")
         return redirect("/recipe_details/" + str(recipe_id))
@@ -247,10 +249,14 @@ def item_modify_from_recipe():
         session["previous_page"] = "recipe"
         session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
 
-    # Open item modify page
+    # Get item id based on the recipe row
     recipe_row = recipes.get_recipe_row(recipe_id, selected_row)
-    print(recipe_row)
     item_id = recipe_row[1]
+
+    # Check that item is not the default item (changing this item is not allowed)
+    if items.is_default_item(item_id):
+        flash("Tyhjää nimikettä ei voi muokata")
+        return redirect("/recipe_details/" + str(recipe_id))
 
     return redirect("/item_details/" + str(item_id))
 

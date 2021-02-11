@@ -28,7 +28,6 @@ def get_item_names():
         name_list.append(name[0])
     return name_list
 
-
 def get_class_names():
     sql = "SELECT name FROM item_classes ORDER BY name"
     result = db.session.execute(sql)
@@ -37,6 +36,14 @@ def get_class_names():
     for item_class in item_classes:
         class_list.append(item_class[0])
     return class_list
+
+def is_default_item(item_id):
+   sql = "SELECT id FROM items WHERE default_item=1"
+   result = db.session.execute(sql)
+   default_item_id = result.fetchone()[0]
+   if item_id == default_item_id:
+       return True
+   return False
 
 def item_change(item_id, item_name, item_class):
     sql = "SELECT id FROM item_classes WHERE name=:item_class"
