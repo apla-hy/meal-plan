@@ -423,7 +423,7 @@ def recipe_new_save():
     recipe_id = recipes.new_recipe(recipe_name)
     if not recipe_id:
         flash("Reseptin luonti ei onnistunut")
-        redirect("/recipe_new")
+        return redirect("/recipe_new")
 
     # Add 5 black rows to the new recipe
     for i in range(5):

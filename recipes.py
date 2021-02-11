@@ -92,8 +92,10 @@ def new_recipe(recipe_name):
         sql = "INSERT INTO recipes (name) VALUES (:name) RETURNING id"
         result = db.session.execute(sql, {"name":recipe_name})
         recipe_id = result.fetchone()[0]
+        print("line before commit")
         db.session.commit()
     except:
+        db.session.rollback()
         return False
     return recipe_id
 
