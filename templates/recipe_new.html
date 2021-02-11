@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Reseptin lisäys{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+  <tr>
+    <td>
+      <form action="/recipe" method=get">
+        <input type="submit" value="Takaisin reseptilistaan">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<form action="/recipe_new_save" method="post">
+  <table>
+    <tr>
+      <td>
+        <label>Anna reseptin nimi:</label>
+      </td>
+      <td>
+        <input type="text" name="recipe_name" value="">
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td>
+        <input type="submit" value="Lisää resepti">
+        </form>
+      </td>
+    </tr>
+  </table>
+
+{% endblock %}

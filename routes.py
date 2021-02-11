@@ -393,3 +393,34 @@ def recipe_delete_row():
 
     return redirect("/recipe_details/"+str(recipe_id))
 
+@app.route("/recipe_new", methods=["get"])
+def recipe_new():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    return render_template("recipe_new.html", username=username)
+
+@app.route("/recipe_new_save", methods=["post"])
+def recipe_new_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    
+    # Add new recipe header
+    recipe_name = request.form["recipe_name"]
+    recipe_id = recipes.new_recipe(recipe_name)
+    if not recipe_id:
+        flash("Reseptin luonti ei onnistunut")
+        redirect("/recipe_new")
+
+    # Add 5 black rows to the new recipe
+    for i in range(5):
+        recipes.new_row(recipe_id)
+
+    return redirect("/recipe_details/"+str(recipe_id))

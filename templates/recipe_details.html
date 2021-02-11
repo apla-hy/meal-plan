@@ -13,6 +13,13 @@
         <input type="submit" value="Takaisin reseptilistaan">
       </form>
     </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
     <td>
       <form action="/recipe_add_row" method="post">
         <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
@@ -41,18 +48,19 @@
 <br>
 
 <form action="/recipe_save" method="post">
-  <table>
-    <tr>
-      <td>
-        <label>Resepti:</label>
-      </td>
-      <td>
-        <input type="text" name="recipe_name" value="{{recipe_name}}">
-      </td>
-    </tr>
-  </table>
 
-  <br>
+<table>
+  <tr>
+    <td>
+      <label>Resepti:</label>
+    </td>
+    <td>
+      <input type="text" name="recipe_name" value="{{recipe_name}}">
+    </td>
+  </tr>
+</table>
+
+<br>
 
   <datalist id="item_names">
     {% for name in item_list %}

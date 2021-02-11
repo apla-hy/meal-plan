@@ -86,6 +86,17 @@ def delete_row(row_id):
     db.session.commit()
 
     return True
+
+def new_recipe(recipe_name):
+    try:
+        sql = "INSERT INTO recipes (name) VALUES (:name) RETURNING id"
+        result = db.session.execute(sql, {"name":recipe_name})
+        recipe_id = result.fetchone()[0]
+        db.session.commit()
+    except:
+        return False
+    return recipe_id
+
     
 
 
