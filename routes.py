@@ -5,6 +5,7 @@ import plans
 import recipes
 import items
 
+
 @app.route("/")
 def index():
     user_id = users.get_user_id()
@@ -22,8 +23,7 @@ def plan():
         return redirect("/")
     username = users.get_username()
 
-    plans.create_default_plan(user_id)
-    plan_id = plans.get_default_plan_id(user_id)
+    plan_id = plans.get_default_plan(user_id)
     startdate = plans.get_startdate(plan_id)
     period = plans.get_period(plan_id)
     planning_dates = plans.get_planning_dates(startdate, period)
@@ -45,6 +45,7 @@ def plan_change_date():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     # Change the start date
     plans.set_startdate(request.form["plan_id"], request.form["startdate"])
@@ -58,6 +59,7 @@ def plan_change_period():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     # Change pediod
     plans.set_period(request.form["plan_id"], request.form["period"])
@@ -71,6 +73,7 @@ def plan_save_rows():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     # Save rows
     plan_id = request.form["plan_id"]
@@ -146,7 +149,7 @@ def item():
         return redirect("/")
     username = users.get_username()
 
-    # Store this page to session history
+    # Store this page to the session history
     session["previous_page"] = "item"
     session["previous_page_url"] = "/item"
 
@@ -181,6 +184,7 @@ def item_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     item_id = request.form["item_id"]
     item_name = request.form["item_name"]
@@ -202,64 +206,6 @@ def item_new():
 
     return render_template("item_new.html", username=username, class_list=class_list, number_of_classes=len(class_list))
 
-@app.route("/item_new_from_recipe", methods=["get"])
-def item_new_from_recipe():
-
-    # Check that there is an active session
-    user_id = users.get_user_id()
-    if not user_id:
-        return redirect("/")
-    username = users.get_username()
-
-    # Store recipe details page to session history
-    recipe_id = request.args.get("recipe_id")
-    if recipe != None:
-        session["previous_page"] = "recipe"
-        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
-
-    return redirect("/item_new")
-
-@app.route("/item_modify_from_recipe", methods=["post"])
-def item_modify_from_recipe():
-
-    # Check that there is an active session
-    user_id = users.get_user_id()
-    if not user_id:
-        return redirect("/")
-    username = users.get_username()
-
-    recipe_id = request.form["recipe_id"]
-    number_of_rows = int(request.form["number_of_rows"])
-    selected_row = 0
-
-    # Loop all rows and find the first selected row
-    for i in range(number_of_rows):
-        row_id = int(request.form.get(str(i) + "_selected", default='0'))
-        if row_id != 0:
-            selected_row = row_id
-            break
-
-    # No row selected
-    if selected_row == 0:
-        flash("Riviä ei ole valittu")
-        return redirect("/recipe_details/" + str(recipe_id))
-
-    # Store recipe details page to session history
-    if recipe != None:
-        session["previous_page"] = "recipe"
-        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
-
-    # Get item id based on the recipe row
-    recipe_row = recipes.get_recipe_row(recipe_id, selected_row)
-    item_id = recipe_row[1]
-
-    # Check that item is not the default item (changing this item is not allowed)
-    if items.is_default_item(item_id):
-        flash("Tyhjää nimikettä ei voi muokata")
-        return redirect("/recipe_details/" + str(recipe_id))
-
-    return redirect("/item_details/" + str(item_id))
-
 
 @app.route("/item_new_save", methods=["post"])
 def item_new_save():
@@ -268,6 +214,7 @@ def item_new_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     item_name = request.form["item_name"]
     item_class = request.form["item_class"]
@@ -330,6 +277,7 @@ def recipe_details(id):
 
     return render_template("recipe_details.html", username=username, recipe_id=recipe_id, recipe_name=recipe_name, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
 
+
 @app.route("/recipe_save", methods=["post"])
 def recipe_save():
 
@@ -337,6 +285,7 @@ def recipe_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     error = False
 
@@ -374,6 +323,7 @@ def recipe_add_row():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     recipe_id = request.form["recipe_id"]
     row_id = recipes.new_row(recipe_id)
@@ -387,6 +337,7 @@ def recipe_delete_row():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
 
     recipe_id = request.form["recipe_id"]
     number_of_rows = int(request.form["number_of_rows"])
@@ -398,6 +349,67 @@ def recipe_delete_row():
             recipes.delete_row(row_id)
 
     return redirect("/recipe_details/"+str(recipe_id))
+
+@app.route("/item_new_from_recipe", methods=["get"])
+def item_new_from_recipe():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Store recipe details page to the session history
+    recipe_id = request.args.get("recipe_id")
+    if recipe != None:
+        session["previous_page"] = "recipe"
+        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
+
+    # Open add items page
+    return redirect("/item_new")
+
+@app.route("/item_modify_from_recipe", methods=["post"])
+def item_modify_from_recipe():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    recipe_id = request.form["recipe_id"]
+    number_of_rows = int(request.form["number_of_rows"])
+
+    # Loop all rows and find the first selected row
+    selected_row = 0
+    for i in range(number_of_rows):
+        row_id = int(request.form.get(str(i) + "_selected", default='0'))
+        if row_id != 0:
+            selected_row = row_id
+            break
+
+    # If no row selected
+    if selected_row == 0:
+        flash("Riviä ei ole valittu")
+        return redirect("/recipe_details/" + str(recipe_id))
+
+    # Store recipe details page to the session history
+    if recipe != None:
+        session["previous_page"] = "recipe"
+        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
+
+    # Get item id based on the recipe row
+    recipe_row = recipes.get_recipe_row(recipe_id, selected_row)
+    item_id = recipe_row[1]
+
+    # Check that item is not the default item (changing this item is not allowed)
+    if items.is_default_item(item_id):
+        flash("Tyhjää nimikettä ei voi muokata")
+        return redirect("/recipe_details/" + str(recipe_id))
+
+    # Open change item page
+    return redirect("/item_details/" + str(item_id))
+
 
 @app.route("/recipe_new", methods=["get"])
 def recipe_new():
@@ -417,6 +429,7 @@ def recipe_new_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
+    username = users.get_username()
     
     # Add new recipe header
     recipe_name = request.form["recipe_name"]
@@ -430,3 +443,4 @@ def recipe_new_save():
         recipes.new_row(recipe_id)
 
     return redirect("/recipe_details/"+str(recipe_id))
+

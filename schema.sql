@@ -26,7 +26,8 @@ CREATE TABLE items (
 
 CREATE TABLE recipes (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE
+    name TEXT UNIQUE,
+    default_recipe INTEGER
 );
 
 CREATE TABLE recipe_rows (
@@ -41,8 +42,11 @@ CREATE TABLE plan_rows (
     plan_id INTEGER REFERENCES plans,
     plan_row_date DATE,
     recipe_0 INTEGER REFERENCES recipes,
+    notes_0 TEXT,
     recipe_1 INTEGER REFERENCES recipes,
+    notes_1 TEXT,
     recipe_2 INTEGER REFERENCES recipes,
+    notes_2 TEXT,
     notes TEXT
 );
 

@@ -13,11 +13,19 @@ def get_recipe_names():
     recipe_list = []
     for recipe in recipes:
         recipe_list.append(recipe[0])
+        if recipe[0] != "":
+            recipe_list.append(recipe[0] + " (valmis)")
     recipe_list.sort()
     return recipe_list
+
+def get_default_recipe_id():
+    sql = "SELECT id FROM recipes WHERE default_recipe=1"
+    result = db.session.execute(sql)
+    recipe_id = result.fetchone()
+    return recipe_id[0]
     
 def recipe_search(query):
-    sql = "SELECT id, name FROM recipes WHERE LOWER(name) LIKE LOWER(:query) ORDER BY name"
+    sql = "SELECT id, name FROM recipes WHERE LOWER(name) LIKE LOWER(:query) AND default_recipe=0 ORDER BY name"
     result = db.session.execute(sql, {"query":"%"+query+"%"})
     recipes = result.fetchall()
     return recipes
