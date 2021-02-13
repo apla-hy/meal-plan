@@ -23,7 +23,7 @@ def get_default_recipe_id():
     result = db.session.execute(sql)
     recipe_id = result.fetchone()
     return recipe_id[0]
-    
+
 def recipe_search(query):
     sql = "SELECT id, name FROM recipes WHERE LOWER(name) LIKE LOWER(:query) AND default_recipe=0 ORDER BY name"
     result = db.session.execute(sql, {"query":"%"+query+"%"})

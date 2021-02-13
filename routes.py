@@ -4,6 +4,7 @@ import users
 import plans
 import recipes
 import items
+import shopping_lists
 
 
 @app.route("/")
@@ -13,6 +14,8 @@ def index():
         return redirect("/plan")
     else:
         return render_template("index.html")
+
+### Plan ###
 
 @app.route("/plan")
 def plan():
@@ -82,15 +85,38 @@ def plan_save_rows():
     
     for i in range(period):
         plan_row_number = i
-        recipes = []
+        selected_recipes = []
         for j in range(3):
-            recipes.append(request.form[str(i) + "_" + str(j)])
+            selected_recipes.append(request.form[str(i) + "_" + str(j)])
         notes = request.form[str(i) + "_notes"]
-        plans.save_row(plan_id, startdate, plan_row_number, recipes, notes)        
+        plans.save_row(plan_id, startdate, plan_row_number, selected_recipes, notes)        
 
     return redirect("/plan")
 
+@app.route("/plan_create_shopping_list", methods=["post"])
+def plan_create_shopping_list():
 
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    plan_id = request.form["plan_id"]
+    startdate = plans.get_startdate(plan_id)
+    period = plans.get_period(plan_id)
+
+    selected_recipes = []
+    for i in range(period):
+        for j in range(3):
+            selected_recipes.append(request.form[str(i) + "_" + str(j)])
+
+    shopping_list_rows = shopping_lists.new_list_from_plan(selected_recipes)
+    print(shopping_list_rows)
+
+    return render_template("shopping_list.html",username=username, rows=shopping_list_rows, number_of_rows=len(shopping_list_rows))
+
+### User ###
 
 @app.route("/login", methods=["get","post"])
 def login():
