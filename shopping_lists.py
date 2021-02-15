@@ -35,6 +35,36 @@ def new_list_from_plan(selected_recipes):
 
     return shopping_list_combined
 
+def get_default_list(user_id):
+    # Check if there is a default list already
+    sql = "SELECT id FROM shopping_lists WHERE user_id=:user_id AND default_list=1"
+    result = db.session.execute(sql, {"user_id":user_id})
+    list_id = result.fetchone()
+    # If not, create default plan
+    if list_id == None:
+        sql = "INSERT INTO shopping_lists (user_id, default_list, name) VALUES (:user_id,1, '') RETURNING id"
+        result = db.session.execute(sql, {"user_id":user_id})
+        list_id = result.fetchone()
+        db.session.commit()
+    return list_id[0]
+
+def save_list_rows(shopping_list_id, shopping_list_rows):
+
+    # Delete old rows
+    sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:shopping_list_id"
+    result = db.session.execute(sql, {"shopping_list_id":shopping_list_id})
+    db.session.commit()
+
+    # Add new rows
+    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount) VALUES (:shopping_list_id, :item_id, :amount)"
+    for row in shopping_list_rows:
+        result = db.session.execute(sql, {"shopping_list_id":shopping_list_id, "item_id":row[0], "amount":row[2]})
+        db.session.commit()
+    
+    return True
+
+
+
 def combine_rows(row_1, row_2):
     combined_row = [row_1[0], row_1[1], ""]
 

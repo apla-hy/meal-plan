@@ -102,6 +102,7 @@ def plan_create_shopping_list():
         return redirect("/")
     username = users.get_username()
 
+    # Collect data from the form
     plan_id = request.form["plan_id"]
     startdate = plans.get_startdate(plan_id)
     period = plans.get_period(plan_id)
@@ -111,8 +112,12 @@ def plan_create_shopping_list():
         for j in range(3):
             selected_recipes.append(request.form[str(i) + "_" + str(j)])
 
+    # Create shopping list
     shopping_list_rows = shopping_lists.new_list_from_plan(selected_recipes)
-    print(shopping_list_rows)
+    
+    # Save shopping list to the database
+    shopping_list_id = shopping_lists.get_default_list(user_id)
+    save_result = shopping_lists.save_list_rows(shopping_list_id, shopping_list_rows)
 
     return render_template("shopping_list.html",username=username, rows=shopping_list_rows, number_of_rows=len(shopping_list_rows))
 

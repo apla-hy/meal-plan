@@ -50,4 +50,18 @@ CREATE TABLE plan_rows (
     notes TEXT
 );
 
+CREATE TABLE shopping_lists (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users,
+    default_list INTEGER,
+    name TEXT UNIQUE
+);
+
+CREATE TABLE shopping_list_rows (
+    id SERIAL PRIMARY KEY,
+    shopping_list_id INTEGER REFERENCES shopping_lists,
+    item_id INTEGER REFERENCES items,
+    amount TEXT
+);
+
 
