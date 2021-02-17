@@ -4,6 +4,26 @@ import plans
 import recipes
 
 
+def list_search(query):
+
+    sql = "SELECT id, name FROM shopping_lists WHERE LOWER(name) LIKE LOWER(:query) AND default_list=0 ORDER BY name"
+    result = db.session.execute(sql, {"query":"%"+query+"%"})
+    lists = result.fetchall()
+    return lists
+
+def get_list(list_id):
+    sql = "SELECT id, name FROM shopping_lists WHERE id=:list_id"
+    result = db.session.execute(sql, {"list_id":list_id})
+    s_list = result.fetchone()
+    return s_list
+
+def get_list_rows(list_id):
+    sql = "SELECT R.id, R.item_id, I.name AS item_name, R.amount, R.marked FROM shopping_list_rows R LEFT JOIN items I ON R.item_id=I.id WHERE R.shopping_list_id=:list_id ORDER BY R.id"
+    result = db.session.execute(sql, {"list_id":list_id})
+    list_rows = result.fetchall()
+    return list_rows
+    
+
 def new_list_from_plan(selected_recipes):
 
     # Find ids for the selected recipes
@@ -56,11 +76,30 @@ def save_list_rows(shopping_list_id, shopping_list_rows):
     db.session.commit()
 
     # Add new rows
-    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount) VALUES (:shopping_list_id, :item_id, :amount)"
+    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:shopping_list_id, :item_id, :amount, 0)"
     for row in shopping_list_rows:
         result = db.session.execute(sql, {"shopping_list_id":shopping_list_id, "item_id":row[0], "amount":row[2]})
         db.session.commit()
     
+    return True
+
+
+def mark_row(row_id):
+
+    # Check if the row is currently marked or not
+    sql = "SELECT marked FROM shopping_list_rows WHERE id=:row_id"
+    result = db.session.execute(sql, {"row_id":row_id})
+    row_marked = result.fetchone()[0]
+    mark_value = 1
+    if row_marked:
+        mark_value = 0
+
+    try:
+        sql = "UPDATE shopping_list_rows SET marked=:mark_value WHERE id=:row_id"
+        db.session.execute(sql, {"row_id":row_id, "mark_value":mark_value})
+        db.session.commit()
+    except:
+        return False
     return True
 
 

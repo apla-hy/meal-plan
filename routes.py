@@ -113,13 +113,94 @@ def plan_create_shopping_list():
             selected_recipes.append(request.form[str(i) + "_" + str(j)])
 
     # Create shopping list
-    shopping_list_rows = shopping_lists.new_list_from_plan(selected_recipes)
+    list_rows = shopping_lists.new_list_from_plan(selected_recipes)
+    print(list_rows)
     
     # Save shopping list to the database
-    shopping_list_id = shopping_lists.get_default_list(user_id)
-    save_result = shopping_lists.save_list_rows(shopping_list_id, shopping_list_rows)
+    list_id = shopping_lists.get_default_list(user_id)
+    save_result = shopping_lists.save_list_rows(list_id, list_rows)
 
-    return render_template("shopping_list.html",username=username, rows=shopping_list_rows, number_of_rows=len(shopping_list_rows))
+    return redirect("/shopping_list_details/"+str(list_id))
+
+### Shopping list ###
+
+@app.route("/shopping_list", methods=["get"])
+def shopping_list():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    query = request.args.get("query")
+    if query == None:
+        query = ''
+    lists = shopping_lists.list_search(query)
+
+    return render_template("shopping_list.html",username=username, lists=lists, number_of_lists=len(lists))
+
+@app.route("/shopping_list_details/<int:id>", methods=["get"])
+def shopping_list_details(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Get shopping list data from the database
+    list_id = id
+    default_list = False
+    default_list_id = shopping_lists.get_default_list(user_id)
+    if list_id == default_list_id:
+        default_list = True
+
+    list_data = shopping_lists.get_list(list_id)
+    list_name = list_data[1]
+    list_rows = shopping_lists.get_list_rows(list_id)
+    row_ids = []
+    row_names = []
+    row_amounts = []
+    row_marks = []
+    for list_row in list_rows:
+        row_ids.append(list_row[0])
+        row_names.append(list_row[2])
+        row_amounts.append(list_row[3])
+        row_marks.append(list_row[4])
+    item_list = items.get_item_names()
+
+    # If session contains recipe data, use it (there was an error in saving this data)
+    #if "recipe_name" in session:
+    #    recipe_name = session["recipe_name"]
+    #    del session["recipe_name"]
+
+    #if "recipe_rows" in session:
+    #    for recipe_row in session["recipe_rows"]:
+    #        index = row_ids.index(int(recipe_row[0]))
+    #        row_ids[index] = recipe_row[0]
+    #        row_names[index] = recipe_row[1]
+    #        row_amounts[index] = recipe_row[2]
+    #    del session["recipe_rows"]
+
+    return render_template("shopping_list_details.html", username=username, list_id=list_id, list_name=list_name, default_list=default_list, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, row_marks=row_marks, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
+
+
+@app.route("/shopping_list_mark_row/<int:id>", methods=["post"])
+def shopping_list_mark_row(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    list_id = request.form["list_id"]    
+
+    result = shopping_lists.mark_row(id)
+
+    return redirect("/shopping_list_details/"+str(list_id))    
+
 
 ### User ###
 
@@ -252,6 +333,8 @@ def item_new_save():
     item_id = items.item_new(item_name, item_class)
 
     return redirect("/item_new")
+
+### Recipe ###
 
 @app.route("/recipe", methods=["get"])
 def recipe():

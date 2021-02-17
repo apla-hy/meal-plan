@@ -61,7 +61,8 @@ CREATE TABLE shopping_list_rows (
     id SERIAL PRIMARY KEY,
     shopping_list_id INTEGER REFERENCES shopping_lists,
     item_id INTEGER REFERENCES items,
-    amount TEXT
+    amount TEXT,
+    marked INTEGER
 );
 
 

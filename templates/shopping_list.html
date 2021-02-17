@@ -1,41 +1,33 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Ostoslista{% endblock %}</h1>
+  <h1>{% block title %}Tallennetut ostoslistat{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
 
 <table>
-<tr>
-<td>
-<form action="/shopping_list" method="get">
-<label>Hae ostoslistan riviä</label>
-<input type="text" name="query">
-<input type="submit" value="Hae">
-</form>
-</td>
-<td>
-<form action="/shopping_list_new_row" method="get">
-<input type="submit" value="Lisää uusi rivi">
-</td>
-</form>
-
-</tr>
+  <tr>
+    <td>
+      <form action="/shopping_list" method="get">
+        <label>Hae ostoslistoja</label>
+        <input type="text" name="query">
+        <input type="submit" value="Hae">
+      </form>
+    </td>
+  </tr>
 </table>
 
 <br>
 
 <table>
   <tr>
-    <th>Nimike</th>
-    <th>Määrä</th>
+    <th>Ostoslistan nimi</th>
   </tr>
 
-{% for i in range(number_of_rows) %}
+{% for i in range(number_of_lists) %}
 <tr>
-<td><a href="/item_details/{{ rows[i][0] }}">{{ rows[i][1] }}</a></td>
-<td><label>{{ rows[i][2] }}</label></td>
+<td><a href="/shopping_list_details/{{ lists[i][0] }}">{{ lists[i][1] }}</a></td>
 </tr>
 {% endfor %}
 </table>

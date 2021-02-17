@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Ostoslistan muokkaus{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+  <tr>
+    <td>
+      <form action="/shopping_list" method=get">
+        <input type="submit" value="Näytä tallennetut ostoslistat">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <td>
+      <form action="/shopping_list_add_row" method="post">
+        <input type="hidden" name="list_id" value="{{ list_id }}">
+        <input type="submit" value="Lisää rivi">
+      </form>
+    </td>
+    <td>
+      <form action="/shopping_list_delete_row" id="form_selected_rows" method="post">
+        <input type="submit" value="Poista valitut rivit">
+        <input type="hidden" name="list_id" value="{{ list_id }}">
+        <input type="hidden" name="number_of_rows" value="{{ number_of_rows }}">
+      </form>
+    </td>
+    <td>
+      <form action="/item_new_from_shopping_list" method="get">
+        <input type="hidden" name="list_id" value="{{ list_id }}">
+        <input type="submit" value="Lisää uusi nimike">
+      </form>
+    </td>
+    <td>
+      <button type="submit" form="form_selected_rows" formaction="/item_modify_from_shopping_list">Muokkaa valitun rivin nimikettä</button>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<form action="/shopping_list_save" method="post">
+
+{% if default_list != True %}
+<table>
+  <tr>
+    <td>
+      <label>Ostoslistan nimi:</label>
+    </td>
+    <td>
+      <input type="text" name="list_name" value="{{list_name}}">
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<br>
+
+  <datalist id="item_names">
+    {% for name in item_list %}
+      <option>{{ name }}</option>
+    {% endfor %}
+  </datalist>
+
+  <table>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>
+        <label>Nimike</label>
+      </th>
+      <th>
+        <label>Määrä</label>
+      </th>
+    </tr>
+    {% for i in range(number_of_rows) %}
+      <tr>
+        <td>
+          <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
+        </td>
+        <td>
+          <input type="checkbox" name="{{i}}_selected" form="form_selected_rows" value={{row_ids[i]}}>
+        </td>
+        <td>
+          <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}"
+          {% if row_marks[i] == 1 %} style="text-decoration: line-through; color:Gray;" {% endif %} />
+        </td>
+        <td>
+          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"
+            {% if row_marks[i] == 1 %}style="text-decoration: line-through; color:Gray;"{% endif %} >
+        </td>
+        <td>
+          <input type="image" src="/static/images/checked_checkbox1600.png" alt="Merkitse ostetuksi" width="24" height="24" formaction="/shopping_list_mark_row/{{row_ids[i]}}" title="Merkitse ostetuksi tai poista merkintä." >
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <br>
+  
+  <table>
+    <tr>
+      <td>
+        <input type="hidden" name="list_id" value={{list_id}}>
+        <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
+        <input type="submit" value="Tallenna">
+        </form>
+      </td>
+      <td>
+        <form action="/shopping_list_details/{{list_id}}" method="get">
+          <input type="submit" value="Peru tallentamattomat muutokset">
+        </form>
+      </td>
+    </tr>
+  </table>
+
+{% endblock %}
