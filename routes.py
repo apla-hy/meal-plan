@@ -170,21 +170,61 @@ def shopping_list_details(id):
         row_marks.append(list_row[4])
     item_list = items.get_item_names()
 
-    # If session contains recipe data, use it (there was an error in saving this data)
-    #if "recipe_name" in session:
-    #    recipe_name = session["recipe_name"]
-    #    del session["recipe_name"]
+    # If session contains shopping list data, use it (there was an error in saving this data)
+    if "list_name" in session:
+        list_name = session["list_name"]
+        del session["list_name"]
 
-    #if "recipe_rows" in session:
-    #    for recipe_row in session["recipe_rows"]:
-    #        index = row_ids.index(int(recipe_row[0]))
-    #        row_ids[index] = recipe_row[0]
-    #        row_names[index] = recipe_row[1]
-    #        row_amounts[index] = recipe_row[2]
-    #    del session["recipe_rows"]
+    if "list_rows" in session:
+        for list_row in session["list_rows"]:
+            if int(list_row[0]) in row_ids:
+                index = row_ids.index(int(list_row[0]))
+                row_ids[index] = list_row[0]
+                row_names[index] = list_row[1]
+                row_amounts[index] = list_row[2]
+        del session["list_rows"]
 
     return render_template("shopping_list_details.html", username=username, list_id=list_id, list_name=list_name, default_list=default_list, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, row_marks=row_marks, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
 
+@app.route("/shopping_list_save", methods=["post"])
+def shopping_list_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    error = False
+
+    # Save header
+    list_id = request.form["list_id"]
+    default_list_id = shopping_lists.get_default_list(user_id)
+    if not int(list_id) == default_list_id:
+        list_name = request.form["list_name"]
+        if not shopping_lists.save_header(list_id, list_name):
+            error = True
+            session["list_name"] = list_name
+            flash("Listan nimen tallentaminen ei onnistunut")
+
+    # Save rows
+    error_rows = []
+    number_of_rows = int(request.form["number_of_rows"])
+    for i in range(number_of_rows):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        if not shopping_lists.save_row(row_id, item_name, amount):
+            error = True
+            error_rows.append([row_id, item_name, amount])
+            flash("Rivin " + item_name + " tallentaminen ei onnistunut")
+    if len(error_rows) > 0:
+        session["list_rows"] = error_rows
+
+    if not error:
+        flash("Muutokset tallennettu")
+
+    return redirect("/shopping_list_details/"+str(list_id))
 
 @app.route("/shopping_list_mark_row/<int:id>", methods=["post"])
 def shopping_list_mark_row(id):
@@ -197,7 +237,62 @@ def shopping_list_mark_row(id):
 
     list_id = request.form["list_id"]    
 
-    result = shopping_lists.mark_row(id)
+    result = shopping_lists.mark_row(list_id, id)
+
+    return redirect("/shopping_list_details/"+str(list_id))    
+
+
+@app.route("/shopping_list_add_row", methods=["post"])
+def shopping_list_add_row():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Store form data to session (needed if form data is not saved before adding row)
+    list_id = request.form["list_id"]
+    if not int(list_id) == shopping_lists.get_default_list(user_id):
+        session["list_name"] = request.form["list_name"]
+    list_rows = []
+    for i in range(int(request.form["number_of_rows"])):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        list_rows.append([row_id, item_name, amount])
+    session["list_rows"] = list_rows    
+
+    # Add row
+    row_id = shopping_lists.new_row(list_id)
+
+    return redirect("/shopping_list_details/"+str(list_id))
+
+
+
+@app.route("/shopping_list_delete_row/<int:id>", methods=["post"])
+def shopping_list_delete_row(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Store form data to session (needed if form data is not saved before adding row)
+    list_id = request.form["list_id"]
+    if not int(list_id) == shopping_lists.get_default_list(user_id):
+        session["list_name"] = request.form["list_name"]
+    list_rows = []
+    for i in range(int(request.form["number_of_rows"])):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        list_rows.append([row_id, item_name, amount])
+    session["list_rows"] = list_rows    
+
+    # Delete row
+    result = shopping_lists.delete_row(list_id, id)
 
     return redirect("/shopping_list_details/"+str(list_id))    
 
@@ -251,6 +346,8 @@ def profile():
             return redirect("/")
         else:
             return render_template("error.html",username=username, message="Tietojen tallannus ei onnistunut")
+
+### Item ###
 
 @app.route("/item", methods=["get"])
 def item():

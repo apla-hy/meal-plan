@@ -21,17 +21,7 @@
 <table>
   <tr>
     <td>
-      <form action="/shopping_list_add_row" method="post">
-        <input type="hidden" name="list_id" value="{{ list_id }}">
-        <input type="submit" value="Lisää rivi">
-      </form>
-    </td>
-    <td>
-      <form action="/shopping_list_delete_row" id="form_selected_rows" method="post">
-        <input type="submit" value="Poista valitut rivit">
-        <input type="hidden" name="list_id" value="{{ list_id }}">
-        <input type="hidden" name="number_of_rows" value="{{ number_of_rows }}">
-      </form>
+      <input type="submit" value="Lisää rivi" form="form_main" formaction="/shopping_list_add_row" >
     </td>
     <td>
       <form action="/item_new_from_shopping_list" method="get">
@@ -39,15 +29,12 @@
         <input type="submit" value="Lisää uusi nimike">
       </form>
     </td>
-    <td>
-      <button type="submit" form="form_selected_rows" formaction="/item_modify_from_shopping_list">Muokkaa valitun rivin nimikettä</button>
-    </td>
   </tr>
 </table>
 
 <br>
 
-<form action="/shopping_list_save" method="post">
+<form action="/shopping_list_save" id="form_main" method="post">
 
 {% if default_list != True %}
 <table>
@@ -87,8 +74,7 @@
           <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
         </td>
         <td>
-          <input type="checkbox" name="{{i}}_selected" form="form_selected_rows" value={{row_ids[i]}}>
-        </td>
+          <input type="image" src="/static/images/checked.png" alt="Merkitse ostetuksi" width="18" height="18" formaction="/shopping_list_mark_row/{{row_ids[i]}}" title="Merkitse ostetuksi tai poista merkintä" >        </td>
         <td>
           <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}"
           {% if row_marks[i] == 1 %} style="text-decoration: line-through; color:Gray;" {% endif %} />
@@ -98,7 +84,10 @@
             {% if row_marks[i] == 1 %}style="text-decoration: line-through; color:Gray;"{% endif %} >
         </td>
         <td>
-          <input type="image" src="/static/images/checked_checkbox1600.png" alt="Merkitse ostetuksi" width="24" height="24" formaction="/shopping_list_mark_row/{{row_ids[i]}}" title="Merkitse ostetuksi tai poista merkintä." >
+          <input type="image" src="/static/images/delete.png" alt="Poista rivi" width="18" height="18" formaction="/shopping_list_delete_row/{{row_ids[i]}}" title="Poista rivi" >
+        </td>
+        <td>
+          <input type="image" src="/static/images/edit.png" alt="Muokkaa rivin nimikettä" width="18" height="18" formaction="/item_modify_from_shopping_list/{{row_ids[i]}}" title="Muokkaa rivin nimikettä" >
         </td>
       </tr>
     {% endfor %}

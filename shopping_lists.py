@@ -1,6 +1,7 @@
 from db import db
 from flask import session
 import plans
+import items
 import recipes
 
 
@@ -84,24 +85,72 @@ def save_list_rows(shopping_list_id, shopping_list_rows):
     return True
 
 
-def mark_row(row_id):
+def mark_row(list_id, row_id):
 
     # Check if the row is currently marked or not
-    sql = "SELECT marked FROM shopping_list_rows WHERE id=:row_id"
-    result = db.session.execute(sql, {"row_id":row_id})
+    sql = "SELECT marked FROM shopping_list_rows WHERE shopping_list_id=:list_id AND id=:row_id"
+    result = db.session.execute(sql, {"list_id":list_id, "row_id":row_id})
     row_marked = result.fetchone()[0]
     mark_value = 1
     if row_marked:
         mark_value = 0
 
     try:
-        sql = "UPDATE shopping_list_rows SET marked=:mark_value WHERE id=:row_id"
-        db.session.execute(sql, {"row_id":row_id, "mark_value":mark_value})
+        sql = "UPDATE shopping_list_rows SET marked=:mark_value WHERE shopping_list_id=:list_id AND id=:row_id"
+        db.session.execute(sql, {"list_id":list_id, "row_id":row_id, "mark_value":mark_value})
         db.session.commit()
     except:
         return False
     return True
 
+
+def delete_row(list_id, row_id):
+
+    try:
+        sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:list_id AND id=:row_id"
+        db.session.execute(sql, {"list_id":list_id, "row_id":row_id})
+        db.session.commit()
+    except:
+        return False
+    return True
+
+
+def save_header(list_id, list_name):
+    try:
+        sql = "UPDATE shopping_lists SET name=:name WHERE id=:list_id"
+        db.session.execute(sql, {"list_id":list_id, "name":list_name})
+        db.session.commit()
+    except:
+        return False
+    return True
+
+def save_row(row_id, item_name, amount):
+
+    # Find id for the item
+    sql = "SELECT id FROM items WHERE name=:name"
+    result = db.session.execute(sql, {"name":item_name})
+    item_id = result.fetchone()
+    if item_id == None:
+        print("Virhe: valittua nimikettä ei löydy")
+        return False
+    else:
+        item_id = item_id[0]
+
+    # Update shopping list row data to the database
+    sql = "UPDATE shopping_list_rows SET amount=:amount, item_id=:item_id WHERE id=:row_id"
+    db.session.execute(sql, {"row_id":row_id, "item_id":item_id, "amount":amount})
+    db.session.commit()
+
+    return True
+
+def new_row(list_id):
+    item_id = items.get_default_item_id()
+    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount) VALUES (:list_id, :item_id, '') RETURNING id"
+    result = db.session.execute(sql, {"list_id":list_id, "item_id":item_id})
+    row_id = result.fetchone()[0]
+    db.session.commit()
+
+    return row_id
 
 
 def combine_rows(row_1, row_2):
