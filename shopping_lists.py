@@ -6,7 +6,6 @@ import recipes
 
 
 def list_search(query):
-
     sql = "SELECT id, name FROM shopping_lists WHERE LOWER(name) LIKE LOWER(:query) AND default_list=0 ORDER BY name"
     result = db.session.execute(sql, {"query":"%"+query+"%"})
     lists = result.fetchall()
@@ -23,7 +22,14 @@ def get_list_rows(list_id):
     result = db.session.execute(sql, {"list_id":list_id})
     list_rows = result.fetchall()
     return list_rows
-    
+  
+def get_list_row(list_id, row_id):
+    sql = "SELECT R.id, R.item_id, I.name AS item_name, R.amount, R.marked FROM shopping_list_rows R LEFT JOIN items I ON R.item_id=I.id WHERE R.shopping_list_id=:list_id AND R.id=:row_id"
+    result = db.session.execute(sql, {"list_id":list_id, "row_id":row_id})
+    list_row = result.fetchone()
+    return list_row
+
+
 
 def new_list_from_plan(selected_recipes):
 

@@ -235,8 +235,19 @@ def shopping_list_mark_row(id):
         return redirect("/")
     username = users.get_username()
 
-    list_id = request.form["list_id"]    
+    # Store form data to session (needed if form data is not saved before calling this action)
+    list_id = request.form["list_id"]
+    if not int(list_id) == shopping_lists.get_default_list(user_id):
+        session["list_name"] = request.form["list_name"]
+    list_rows = []
+    for i in range(int(request.form["number_of_rows"])):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        list_rows.append([row_id, item_name, amount])
+    session["list_rows"] = list_rows    
 
+    # Toggle row mark
     result = shopping_lists.mark_row(list_id, id)
 
     return redirect("/shopping_list_details/"+str(list_id))    
@@ -251,7 +262,7 @@ def shopping_list_add_row():
         return redirect("/")
     username = users.get_username()
 
-    # Store form data to session (needed if form data is not saved before adding row)
+    # Store form data to session (needed if form data is not saved before calling this action)
     list_id = request.form["list_id"]
     if not int(list_id) == shopping_lists.get_default_list(user_id):
         session["list_name"] = request.form["list_name"]
@@ -279,7 +290,7 @@ def shopping_list_delete_row(id):
         return redirect("/")
     username = users.get_username()
 
-    # Store form data to session (needed if form data is not saved before adding row)
+    # Store form data to session (needed if form data is not saved before calling this action)
     list_id = request.form["list_id"]
     if not int(list_id) == shopping_lists.get_default_list(user_id):
         session["list_name"] = request.form["list_name"]
@@ -295,6 +306,55 @@ def shopping_list_delete_row(id):
     result = shopping_lists.delete_row(list_id, id)
 
     return redirect("/shopping_list_details/"+str(list_id))    
+
+
+@app.route("/item_new_from_shopping_list", methods=["get"])
+def item_new_from_shopping_list():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Store shopping list details page to the session history
+    list_id = request.args.get("list_id")
+    if list_id != None:
+        session["previous_page"] = "shopping_list"
+        session["previous_page_url"] = "/shopping_list_details/" + str(list_id)
+
+    # Open add items page
+    return redirect("/item_new")
+
+@app.route("/item_modify_from_shopping_list//<int:id>", methods=["post"])
+def item_modify_from_shopping_list(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    list_id = request.form["list_id"]
+    row_id = id
+
+    # Store shopping list details page to the session history
+    session["previous_page"] = "shopping_list"
+    session["previous_page_url"] = "/shopping_list_details/" + str(list_id)
+
+    # Get item id based on the list row
+    list_row = shopping_lists.get_list_row(list_id, row_id)
+    item_id = list_row[1]
+
+    # Check that item is not the default item (changing this item is not allowed)
+    if items.is_default_item(item_id):
+        flash("Tyhjää nimikettä ei voi muokata")
+        return redirect("/shopping_list_details/" + str(list_id))
+
+    # Open change item page
+    return redirect("/item_details/" + str(item_id))
+
+
 
 
 ### User ###
@@ -572,7 +632,7 @@ def item_new_from_recipe():
 
     # Store recipe details page to the session history
     recipe_id = request.args.get("recipe_id")
-    if recipe != None:
+    if recipe_id != None:
         session["previous_page"] = "recipe"
         session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
 

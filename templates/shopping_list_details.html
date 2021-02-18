@@ -80,7 +80,7 @@
           {% if row_marks[i] == 1 %} style="text-decoration: line-through; color:Gray;" {% endif %} />
         </td>
         <td>
-          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"
+          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}" tabindex={{i+1}}
             {% if row_marks[i] == 1 %}style="text-decoration: line-through; color:Gray;"{% endif %} >
         </td>
         <td>

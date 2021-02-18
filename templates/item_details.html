@@ -12,6 +12,11 @@
       <input type="submit" value="Takaisin reseptin muokkaukseen">
     </form>
   {% endif %}
+  {% if session['previous_page'] == 'shopping_list' %}
+    <form action={{session['previous_page_url']}} method="get">
+      <input type="submit" value="Takaisin ostoslistan muokkaukseen">
+    </form>
+  {% endif %}
   {% if session['previous_page'] == 'item' %}
     <form action="/item" method="get">
       <input type="submit" value="Takaisin nimikelistaan">
