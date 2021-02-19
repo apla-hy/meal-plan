@@ -29,8 +29,6 @@ def get_list_row(list_id, row_id):
     list_row = result.fetchone()
     return list_row
 
-
-
 def new_list_from_plan(selected_recipes):
 
     # Find ids for the selected recipes
@@ -157,6 +155,18 @@ def new_row(list_id):
     db.session.commit()
 
     return row_id
+
+def new_list(user_id, list_name):
+    try:
+        sql = "INSERT INTO shopping_lists (user_id, default_list, name) VALUES (:user_id, 0, :name) RETURNING id"
+        result = db.session.execute(sql, {"user_id":user_id, "name":list_name})
+        list_id = result.fetchone()[0]
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
+    return list_id
+
 
 
 def combine_rows(row_1, row_2):

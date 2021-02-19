@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Ostoslistan lisäys{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+  <tr>
+    <td>
+      <form action="/shopping_list" method=get">
+        <input type="submit" value="Takaisin tallennettuihin ostoslistoihin">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<form action="/shopping_list_new_save" method="post">
+  <table>
+    <tr>
+      <td>
+        <label>Anna ostoslistan nimi:</label>
+      </td>
+      <td>
+        <input type="text" name="shopping_list_name" value="">
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td>
+        <input type="submit" value="Lisää ostoslista">
+        </form>
+      </td>
+    </tr>
+  </table>
+
+{% endblock %}

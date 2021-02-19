@@ -114,7 +114,6 @@ def plan_create_shopping_list():
 
     # Create shopping list
     list_rows = shopping_lists.new_list_from_plan(selected_recipes)
-    print(list_rows)
     
     # Save shopping list to the database
     list_id = shopping_lists.get_default_list(user_id)
@@ -122,7 +121,24 @@ def plan_create_shopping_list():
 
     return redirect("/shopping_list_details/"+str(list_id))
 
+
+@app.route("/plan_show_default_shopping_list", methods=["post"])
+def plan_show_default_shopping_list():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    list_id = shopping_lists.get_default_list(user_id)
+
+    return redirect("/shopping_list_details/"+str(list_id))
+
+
+#####################
 ### Shopping list ###
+#####################
 
 @app.route("/shopping_list", methods=["get"])
 def shopping_list():
@@ -355,6 +371,39 @@ def item_modify_from_shopping_list(id):
     return redirect("/item_details/" + str(item_id))
 
 
+@app.route("/shopping_list_new", methods=["get"])
+def shopping_list_new():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    return render_template("shopping_list_new.html", username=username)
+
+
+@app.route("/shopping_list_new_save", methods=["post"])
+def shopping_list_new_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+    
+    # Add new shopping list header
+    list_name = request.form["shopping_list_name"]
+    list_id = shopping_lists.new_list(user_id, list_name)
+    if not list_id:
+        flash("Ostoslistan luonti ei onnistunut")
+        return redirect("/shopping_list_new")
+
+    # Add 3 black rows to the new shopping list
+    for i in range(3):
+        shopping_lists.new_row(list_id)
+
+    return redirect("/shopping_list_details/"+str(list_id))
 
 
 ### User ###
@@ -709,8 +758,8 @@ def recipe_new_save():
         flash("Reseptin luonti ei onnistunut")
         return redirect("/recipe_new")
 
-    # Add 5 black rows to the new recipe
-    for i in range(5):
+    # Add 3 black rows to the new recipe
+    for i in range(3):
         recipes.new_row(recipe_id)
 
     return redirect("/recipe_details/"+str(recipe_id))
