@@ -13,6 +13,11 @@
         <input type="submit" value="Näytä tallennetut ostoslistat">
       </form>
     </td>
+    {% if default_list == True %}
+    <td>
+      <input type="submit" value="Tallenna ostoslista nimellä" form="form_main" formaction="/shopping_list_new_from_default" >
+    </td>
+    {% endif %}
   </tr>
 </table>
 

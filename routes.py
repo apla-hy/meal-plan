@@ -15,7 +15,9 @@ def index():
     else:
         return render_template("index.html")
 
+############
 ### Plan ###
+############
 
 @app.route("/plan")
 def plan():
@@ -342,7 +344,7 @@ def item_new_from_shopping_list():
     # Open add items page
     return redirect("/item_new")
 
-@app.route("/item_modify_from_shopping_list//<int:id>", methods=["post"])
+@app.route("/item_modify_from_shopping_list/<int:id>", methods=["post"])
 def item_modify_from_shopping_list(id):
 
     # Check that there is an active session
@@ -380,6 +382,7 @@ def shopping_list_new():
         return redirect("/")
     username = users.get_username()
 
+    # Open page to get name for the new list
     return render_template("shopping_list_new.html", username=username)
 
 
@@ -399,14 +402,43 @@ def shopping_list_new_save():
         flash("Ostoslistan luonti ei onnistunut")
         return redirect("/shopping_list_new")
 
-    # Add 3 black rows to the new shopping list
+    # Add 3 blank rows to the new shopping list
     for i in range(3):
         shopping_lists.new_row(list_id)
 
     return redirect("/shopping_list_details/"+str(list_id))
 
 
+@app.route("/shopping_list_new_from_default", methods=["post"])
+def shopping_list_new_from_default():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+    default_list_id =  shopping_lists.get_default_list(user_id)
+
+    return render_template("shopping_list_new_from_default.html", username=username, default_list_id=default_list_id)
+
+
+@app.route("/shopping_list_new_from_default_save", methods=["post"])
+def shopping_list_new_from_default_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+    
+    list_name = request.form["shopping_list_name"]
+    list_id = shopping_lists.save_default_list_with_name(user_id, list_name)
+
+    return redirect("/shopping_list_details/"+str(list_id))
+
+############
 ### User ###
+############
 
 @app.route("/login", methods=["get","post"])
 def login():
@@ -456,7 +488,9 @@ def profile():
         else:
             return render_template("error.html",username=username, message="Tietojen tallannus ei onnistunut")
 
+############
 ### Item ###
+############
 
 @app.route("/item", methods=["get"])
 def item():
@@ -540,7 +574,9 @@ def item_new_save():
 
     return redirect("/item_new")
 
+##############
 ### Recipe ###
+##############
 
 @app.route("/recipe", methods=["get"])
 def recipe():
@@ -551,6 +587,7 @@ def recipe():
         return redirect("/")
     username = users.get_username()
 
+    # Run search
     query = request.args.get("query")
     if query == None:
         query = ''
@@ -567,6 +604,10 @@ def recipe_details(id):
     if not user_id:
         return redirect("/")
     username = users.get_username()
+
+    # Check that recipe is not the default recipe (modification is not allowed)
+    if id == recipes.get_default_recipe_id():
+        return redirect("/")
 
     # Get recipe data from the database
     recipe_id = id
@@ -589,10 +630,11 @@ def recipe_details(id):
 
     if "recipe_rows" in session:
         for recipe_row in session["recipe_rows"]:
-            index = row_ids.index(int(recipe_row[0]))
-            row_ids[index] = recipe_row[0]
-            row_names[index] = recipe_row[1]
-            row_amounts[index] = recipe_row[2]
+            if int(recipe_row[0]) in row_ids:
+                index = row_ids.index(int(recipe_row[0]))
+                row_ids[index] = recipe_row[0]
+                row_names[index] = recipe_row[1]
+                row_amounts[index] = recipe_row[2]
         del session["recipe_rows"]
 
     return render_template("recipe_details.html", username=username, recipe_id=recipe_id, recipe_name=recipe_name, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
@@ -645,13 +687,25 @@ def recipe_add_row():
         return redirect("/")
     username = users.get_username()
 
+    # Store form data to session (needed if form data is not saved before calling this action)
     recipe_id = request.form["recipe_id"]
+    if not int(recipe_id) == recipes.get_default_recipe_id():
+        session["recipe_name"] = request.form["recipe_name"]
+    recipe_rows = []
+    for i in range(int(request.form["number_of_rows"])):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        recipe_rows.append([row_id, item_name, amount])
+    session["recipe_rows"] = recipe_rows    
+
     row_id = recipes.new_row(recipe_id)
 
     return redirect("/recipe_details/"+str(recipe_id))
 
-@app.route("/recipe_delete_row", methods=["post"])
-def recipe_delete_row():
+
+@app.route("/recipe_delete_row/<int:id>", methods=["post"])
+def recipe_delete_row(id):
 
     # Check that there is an active session
     user_id = users.get_user_id()
@@ -659,16 +713,25 @@ def recipe_delete_row():
         return redirect("/")
     username = users.get_username()
 
+    # Store form data to session (needed if form data is not saved before calling this action)
     recipe_id = request.form["recipe_id"]
-    number_of_rows = int(request.form["number_of_rows"])
+    if not int(recipe_id) == recipes.get_default_recipe_id():
+        session["recipe_name"] = request.form["recipe_name"]
+    recipe_rows = []
+    for i in range(int(request.form["number_of_rows"])):
+        row_id = request.form[str(i) + "_row_id"]
+        item_name = request.form[str(i) + "_row_name"]
+        amount = request.form[str(i) + "_row_amount"]
+        recipe_rows.append([row_id, item_name, amount])
+    session["recipe_rows"] = recipe_rows    
 
-    # Loop all rows and delete the selected ones
-    for i in range(number_of_rows):
-        row_id = int(request.form.get(str(i) + "_selected", default='0'))
-        if row_id != 0:
-            recipes.delete_row(row_id)
+    # Delete row
+    result = recipes.delete_row(recipe_id, id)
 
-    return redirect("/recipe_details/"+str(recipe_id))
+    return redirect("/recipe_details/"+str(recipe_id))    
+
+
+
 
 @app.route("/item_new_from_recipe", methods=["get"])
 def item_new_from_recipe():
@@ -688,8 +751,9 @@ def item_new_from_recipe():
     # Open add items page
     return redirect("/item_new")
 
-@app.route("/item_modify_from_recipe", methods=["post"])
-def item_modify_from_recipe():
+
+@app.route("/item_modify_from_recipe/<int:id>", methods=["post"])
+def item_modify_from_recipe(id):
 
     # Check that there is an active session
     user_id = users.get_user_id()
@@ -698,37 +762,24 @@ def item_modify_from_recipe():
     username = users.get_username()
 
     recipe_id = request.form["recipe_id"]
-    number_of_rows = int(request.form["number_of_rows"])
-
-    # Loop all rows and find the first selected row
-    selected_row = 0
-    for i in range(number_of_rows):
-        row_id = int(request.form.get(str(i) + "_selected", default='0'))
-        if row_id != 0:
-            selected_row = row_id
-            break
-
-    # If no row selected
-    if selected_row == 0:
-        flash("Riviä ei ole valittu")
-        return redirect("/recipe_details/" + str(recipe_id))
+    row_id = id
 
     # Store recipe details page to the session history
-    if recipe != None:
-        session["previous_page"] = "recipe"
-        session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
+    session["previous_page"] = "recipe"
+    session["previous_page_url"] = "/recipe_details/" + str(recipe_id)
 
-    # Get item id based on the recipe row
-    recipe_row = recipes.get_recipe_row(recipe_id, selected_row)
+    # Get item id based on the list row
+    recipe_row = recipes.get_recipe_row(recipe_id, row_id)
     item_id = recipe_row[1]
 
     # Check that item is not the default item (changing this item is not allowed)
     if items.is_default_item(item_id):
-        flash("Tyhjää nimikettä ei voi muokata")
+        flash("Valittua nimikettä ei voi muokata")
         return redirect("/recipe_details/" + str(recipe_id))
 
     # Open change item page
     return redirect("/item_details/" + str(item_id))
+
 
 
 @app.route("/recipe_new", methods=["get"])

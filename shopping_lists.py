@@ -168,6 +168,20 @@ def new_list(user_id, list_name):
     return list_id
 
 
+def save_default_list_with_name(user_id, list_name):
+    default_list_id = get_default_list(user_id)
+    list_id = new_list(user_id, list_name)
+    if not list_id:
+        return False
+    list_rows = get_list_rows(default_list_id) # Row.id, Row.item_id, Item.name, Row.amount, Row.marked
+    for list_row in list_rows:
+            sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:list_id, :item_id, :amount, :marked) RETURNING id"
+            result = db.session.execute(sql, {"list_id":list_id, "item_id":list_row[1], "amount":list_row[3], "marked":list_row[4]})
+            row_id = result.fetchone()[0]
+            db.session.commit()
+     
+    return list_id
+    
 
 def combine_rows(row_1, row_2):
     combined_row = [row_1[0], row_1[1], ""]

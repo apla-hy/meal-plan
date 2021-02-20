@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Ostoslistan tallennus nimellä{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+  <tr>
+    <td>
+      <form action="/shopping_list_details/{{default_list_id}}" method=get">
+        <input type="submit" value="Takaisin">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<form action="/shopping_list_new_from_default_save" method="post">
+  <table>
+    <tr>
+      <td>
+        <label>Anna ostoslistan nimi:</label>
+      </td>
+      <td>
+        <input type="text" name="shopping_list_name" value="">
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td>
+        <input type="submit" value="Tallenna ostoslista nimellä">
+        </form>
+      </td>
+    </tr>
+  </table>
+
+{% endblock %}

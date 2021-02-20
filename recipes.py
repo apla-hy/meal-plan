@@ -88,9 +88,9 @@ def new_row(recipe_id):
 
     return row_id
 
-def delete_row(row_id):
-    sql = "DELETE FROM recipe_rows WHERE id=:row_id"
-    db.session.execute(sql, {"row_id":row_id})
+def delete_row(recipe_id, row_id):
+    sql = "DELETE FROM recipe_rows WHERE recipe_id=:recipe_id AND id=:row_id"
+    db.session.execute(sql, {"recipe_id":recipe_id, "row_id":row_id})
     db.session.commit()
 
     return True

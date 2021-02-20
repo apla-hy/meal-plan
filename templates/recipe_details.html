@@ -23,14 +23,7 @@
     <td>
       <form action="/recipe_add_row" method="post">
         <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
-        <input type="submit" value="Lisää rivi">
-      </form>
-    </td>
-    <td>
-      <form action="/recipe_delete_row" id="form_selected_rows" method="post">
-        <input type="submit" value="Poista valitut rivit">
-        <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
-        <input type="hidden" name="number_of_rows" value="{{ number_of_rows }}">
+        <input type="submit" value="Lisää rivi" form="form_main" formaction="/recipe_add_row" >
       </form>
     </td>
     <td>
@@ -39,15 +32,12 @@
         <input type="submit" value="Lisää uusi nimike">
       </form>
     </td>
-    <td>
-      <button type="submit" form="form_selected_rows" formaction="/item_modify_from_recipe">Muokkaa valitun rivin nimikettä</button>
-    </td>
   </tr>
 </table>
 
 <br>
 
-<form action="/recipe_save" method="post">
+<form action="/recipe_save" id="form_main" method="post">
 
 <table>
   <tr>
@@ -71,7 +61,6 @@
   <table>
     <tr>
       <th></th>
-      <th></th>
       <th>
         <label>Aines</label>
       </th>
@@ -85,13 +74,16 @@
           <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
         </td>
         <td>
-          <input type="checkbox" name="{{i}}_selected" form="form_selected_rows" value={{row_ids[i]}}>
-        </td>
-        <td>
           <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}" />
         </td>
         <td>
           <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}">
+        </td>
+        <td>
+          <input type="image" src="/static/images/delete.png" alt="Poista rivi" width="18" height="18" formaction="/recipe_delete_row/{{row_ids[i]}}" title="Poista rivi" >
+        </td>
+        <td>
+          <input type="image" src="/static/images/edit.png" alt="Muokkaa rivin nimikettä" width="18" height="18" formaction="/item_modify_from_recipe/{{row_ids[i]}}" title="Muokkaa rivin nimikettä" >
         </td>
       </tr>
     {% endfor %}
