@@ -6,11 +6,34 @@
 
 {% block content %}
 <form action="/profile" method="post">
-Käyttäjätunnus: <input type="text" name="username" value={{username}}>
-<p>
-Salasana: <input type="password" name="password">
-<p>
-<input type="submit" value="Tallenna">
-</form>{% endblock %}
+  <table>
+    <tr>
+      <td>
+        <label>Käyttäjätunnus:</label>
+      </td>
+      <td>
+        <input type="text" name="username" value="{{username}}">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Salasana:</label>
+      </td>
+      <td>
+        <input type="password" name="password">
+      </td>
+     </tr>
+    <tr>
+      <td>
+        <label>Salasana uudestaan:</label>
+      </td>
+      <td>
+        <input type="password" name="password_check">
+      </td>
+    </tr>
+  </table>
+    <input type="submit" value="Tallenna">
+</form>
+{% endblock %}
 
 

@@ -66,8 +66,14 @@ def plan_change_period():
         return redirect("/")
     username = users.get_username()
 
+    # Check that period is in allowed range (1-30)
+    period = int(request.form["period"])
+    if period < 2 or period > 30:
+        flash("Suunnittelujakso pitää olla välillä 1-30")
+        return redirect("/plan")
+
     # Change pediod
-    plans.set_period(request.form["plan_id"], request.form["period"])
+    plans.set_period(request.form["plan_id"], str(period))
 
     return redirect("/plan")
 
@@ -464,10 +470,26 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        password_check = request.form["password_check"]
+
+        # Check that passwords are the same
+        password_check = request.form["password_check"]
+        if password != password_check:
+            flash("Salasanat eivät ole samat")
+            return redirect("/register")
+
+        # Check password length
+        if len(password) < 4:
+            flash("Salasana on liian lyhyt")
+            return redirect("/register")
+
+        # Register user
         if users.register(username,password):
+            flash("Rekisteröinti onnistui")
             return redirect("/")
         else:
-            return render_template("error.html",message="Rekisteröinti ei onnistunut")
+            flash("Rekisteröinti ei onnistunut")
+            return redirect("/register")
 
 @app.route("/profile", methods=["get","post"])
 def profile():
@@ -483,10 +505,25 @@ def profile():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+
+        # Check that passwords are the same
+        password_check = request.form["password_check"]
+        if password != password_check:
+            flash("Salasanat eivät ole samat")
+            return redirect("/profile")
+
+        # Check password length
+        if len(password) < 4:
+            flash("Salasana on liian lyhyt")
+            return redirect("/profile")
+
+        # Save profile data
         if users.update_profile(username,password):
-            return redirect("/")
+            flash("Tiedot tallennettu")
         else:
-            return render_template("error.html",username=username, message="Tietojen tallannus ei onnistunut")
+            flash("Tietojen tallennus ei onnistunut")
+
+    return redirect("/profile")
 
 ############
 ### Item ###
