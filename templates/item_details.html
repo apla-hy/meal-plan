@@ -35,7 +35,7 @@
 <td>
 <select name="item_class">
   {% for i in range(number_of_classes) %}
-  <option value={{class_list[i]}}
+  <option value="{{class_list[i]}}"
   {% if item_class == class_list[i]: %}selected="selected"{% endif %}>
   {{class_list[i]}}</option>
   {% endfor %}

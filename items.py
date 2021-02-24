@@ -29,13 +29,67 @@ def get_item_names():
     return name_list
 
 def get_class_names():
-    sql = "SELECT name FROM item_classes ORDER BY name"
+    sql = "SELECT name FROM item_classes ORDER BY class_order"
     result = db.session.execute(sql)
     item_classes = result.fetchall()
     class_list = []
     for item_class in item_classes:
         class_list.append(item_class[0])
     return class_list
+
+def get_item_classes():
+    sql = "SELECT id, name, class_order FROM item_classes ORDER BY class_order"
+    result = db.session.execute(sql)
+    item_classes = result.fetchall()
+    return item_classes
+
+def item_class_move_up(class_id):
+    sql = "SELECT id, name, class_order FROM item_classes ORDER BY class_order"
+    result = db.session.execute(sql)
+    item_classes = result.fetchall()
+
+    # Find row and move it one step up
+    for i in range(len(item_classes)):
+        if item_classes[i][0] == class_id:
+            if i == 0:
+                return False
+            previous_row_id = item_classes[i-1][0]
+            previous_row_order = item_classes[i-1][2]
+            current_row_id = item_classes[i][0]
+            current_row_order = item_classes[i][2]
+            sql = "UPDATE item_classes SET class_order=:class_order WHERE id=:id"
+            result = db.session.execute(sql, {"class_order":0, "id":previous_row_id})
+            sql = "UPDATE item_classes SET class_order=:class_order WHERE id=:id"
+            result = db.session.execute(sql, {"class_order":previous_row_order, "id":current_row_id})
+            sql = "UPDATE item_classes SET class_order=:class_order WHERE id=:id"
+            result = db.session.execute(sql, {"class_order":current_row_order, "id":previous_row_id})
+            db.session.commit()
+    
+    return True
+
+def item_class_move_down(class_id):
+    sql = "SELECT id, name, class_order FROM item_classes ORDER BY class_order"
+    result = db.session.execute(sql)
+    item_classes = result.fetchall()
+
+    # Find row and move it one step down
+    for i in range(len(item_classes)-1):
+        if item_classes[i][0] == class_id:
+            next_row_id = item_classes[i+1][0]
+            next_row_order = item_classes[i+1][2]
+            current_row_id = item_classes[i][0]
+            current_row_order = item_classes[i][2]
+            sql = "UPDATE item_classes SET class_order=:class_order WHERE id=:id"
+            result = db.session.execute(sql, {"class_order":0, "id":next_row_id})
+            sql = "UPDATE item_classes SET class_order=:class_order WHERE id=:id"
+            result = db.session.execute(sql, {"class_order":next_row_order, "id":current_row_id})
+            sql = "UPDATE item_classes SET class_order=:class_order WHERE id=:id"
+            result = db.session.execute(sql, {"class_order":current_row_order, "id":next_row_id})
+            db.session.commit()
+    
+    return True
+
+
 
 def is_default_item(item_id):
    sql = "SELECT id FROM items WHERE default_item=1"

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Nimikkeiden lisäys ostoslistalta{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+  <tr>
+    <td>
+      <form action="/shopping_list_details/{{list_add_to_id}}" method="get">
+        <input type="submit" value="Takaisin">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <td>
+      <form action="/shopping_list_add_from_list_select_rows" method="post">
+        <input type="hidden" name="list_add_from_id" value={{list_add_from_id}}>
+        <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
+        <input type="submit" value="Valitse kaikki rivit">
+      </form>
+    </td>
+    <td>
+      <form action="/shopping_list_add_from_list_unselect_rows" method="post">
+        <input type="hidden" name="list_add_from_id" value={{list_add_from_id}}>
+        <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
+        <input type="submit" value="Poista kaikkien rivien valinta">
+      </form>
+    </td>
+
+  </tr>
+</table>
+
+
+<br>
+
+<form action="/shopping_list_add_from_list_save" method="post">
+  <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
+  <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
+
+  <table>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>
+        <label>Nimike</label>
+      </th>
+      <th>
+        <label>Määrä</label>
+      </th>
+    </tr>
+    {% for i in range(number_of_rows) %}
+      {% if i == 0 or row_class_names[i] != row_class_names[i-1] %}
+      <tr><td></td></tr>
+      <tr>
+        <td colspan="5">
+          <label><i>{{row_class_names[i]}}</i></label>
+        </td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td>
+          <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
+        </td>
+        <td>
+          <input type="hidden" name="{{i}}_row_item_id" value={{row_item_ids[i]}}>
+        </td>
+        <td>
+          <input type="checkbox" name="{{i}}_selected" value={{row_ids[i]}}  {% if row_checked[i] == 1 %}checked{% endif %}>
+        </td>
+        <td>
+          <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}" readonly>
+        </td>
+        <td>
+          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}">
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  <br>
+  <input type="submit" value="Lisää valitut rivit">
+</form>
+  
+
+
+{% endblock %}

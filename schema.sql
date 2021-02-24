@@ -14,7 +14,8 @@ CREATE TABLE plans (
 
 CREATE TABLE item_classes (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE
+    name TEXT UNIQUE,
+    class_order INTEGER UNIQUE
 );
 
 CREATE TABLE items (

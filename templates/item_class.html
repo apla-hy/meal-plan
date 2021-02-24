@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Nimikeluokat{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<table>
+  <tr>
+    <td>
+      <form action="/" method="get">
+        <input type="submit" value="Palaa etusivulle">
+      </form>
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td>
+      <form action="/item_class_new" method="get">
+        <input type="submit" value="Lisää uusi nimikeluokka">
+      </form>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th></th>
+    <th>Nimikeluokka</th>
+  </tr>
+
+<form action="item_class_save" method="post">
+{% for i in range(number_of_rows) %}
+  <tr>
+    <td>
+      <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
+    </td>
+    <td>
+      <input type="text" value="{{ row_names[i] }}" >
+    </td>
+    <td>
+      <input type="image" src="/static/images/up.png" alt="Siirrä ylöspäin" width="18" height="18" formaction="/item_class_move_up/{{row_ids[i]}}" title="Siirrä ylöspäin" >
+    </td>
+    <td>
+      <input type="image" src="/static/images/down.png" alt="Siirrä alaspäin" width="18" height="18" formaction="/item_class_move_down/{{row_ids[i]}}" title="Siirrä alaspäin" >
+    </td>
+  </tr>
+{% endfor %}
+
+</table>
+
+<br>
+
+<input type="submit" value="Tallenna">
+
+</form>
+
+{% endblock %}
+
+

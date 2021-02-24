@@ -18,7 +18,7 @@ def get_list(list_id):
     return s_list
 
 def get_list_rows(list_id):
-    sql = "SELECT R.id, R.item_id, I.name AS item_name, R.amount, R.marked FROM shopping_list_rows R LEFT JOIN items I ON R.item_id=I.id WHERE R.shopping_list_id=:list_id ORDER BY R.id"
+    sql = "SELECT R.id, R.item_id, I.name AS item_name, R.amount, R.marked, IC.id AS class_id, IC.name AS class_name FROM shopping_list_rows R LEFT JOIN items I ON R.item_id=I.id LEFT JOIN item_classes IC ON I.class_id=IC.id WHERE R.shopping_list_id=:list_id ORDER BY IC.class_order, I.name"
     result = db.session.execute(sql, {"list_id":list_id})
     list_rows = result.fetchall()
     return list_rows
@@ -45,18 +45,12 @@ def new_list_from_plan(selected_recipes):
     default_recipe_id = recipes.get_default_recipe_id()
     for recipe_id in recipe_ids:
         if recipe_id != default_recipe_id:
-            recipe_rows = recipes.get_recipe_rows(recipe_id) # RR.id, RR.item_id, item_name, RR.amount
+            recipe_rows = recipes.get_recipe_rows_with_classes(recipe_id) # RR.id, RR.item_id, item_name, RR.amount, class_id, class_name
             for recipe_row in recipe_rows:
-                shopping_list_rows.append([recipe_row[1], recipe_row[2], recipe_row[3]])
+                shopping_list_rows.append([recipe_row[1], recipe_row[3], 0]) # item_id, amount, marked 
 
     # Combine same items to one row
-    shopping_list_rows.sort()
-    shopping_list_combined = []
-    for i in range(len(shopping_list_rows)):
-        if i < len(shopping_list_rows)-1 and shopping_list_rows[i][0] == shopping_list_rows[i+1][0]:
-            shopping_list_rows[i+1] = combine_rows(shopping_list_rows[i], shopping_list_rows[i+1])
-        else:
-            shopping_list_combined.append(shopping_list_rows[i])
+    shopping_list_combined = remove_duplicate_rows(shopping_list_rows)
 
     return shopping_list_combined
 
@@ -73,17 +67,38 @@ def get_default_list(user_id):
         db.session.commit()
     return list_id[0]
 
-def save_list_rows(shopping_list_id, shopping_list_rows):
+
+def add_items_from_list(list_id, item_list):
+
+    # Get current list rows
+    sql = "SELECT item_id, amount, marked FROM shopping_list_rows WHERE shopping_list_id=:list_id"
+    result = db.session.execute(sql, {"list_id":list_id})
+    list_rows = result.fetchall()
+    
+    # Add all needed items to the shopping list
+    shopping_list_rows = []
+    for list_row in list_rows:
+        shopping_list_rows.append([ list_row[0], list_row[1], list_row[2] ])
+    for item in item_list:
+        shopping_list_rows.append([item[0], item[1], 0])
+
+    # Combine same items to one row
+    shopping_list_combined = remove_duplicate_rows(shopping_list_rows)
+
+    return shopping_list_combined
+    
+
+def save_list_rows(list_id, list_rows):
 
     # Delete old rows
-    sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:shopping_list_id"
-    result = db.session.execute(sql, {"shopping_list_id":shopping_list_id})
+    sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:list_id"
+    result = db.session.execute(sql, {"list_id":list_id})
     db.session.commit()
 
     # Add new rows
-    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:shopping_list_id, :item_id, :amount, 0)"
-    for row in shopping_list_rows:
-        result = db.session.execute(sql, {"shopping_list_id":shopping_list_id, "item_id":row[0], "amount":row[2]})
+    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:list_id, :item_id, :amount, :marked)"
+    for row in list_rows:
+        result = db.session.execute(sql, {"list_id":list_id, "item_id":row[0], "amount":row[1], "marked":row[2]})
         db.session.commit()
     
     return True
@@ -149,7 +164,7 @@ def save_row(row_id, item_name, amount):
 
 def new_row(list_id):
     item_id = items.get_default_item_id()
-    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount) VALUES (:list_id, :item_id, '') RETURNING id"
+    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount) VALUES (:list_id, :item_id, '', 0) RETURNING id"
     result = db.session.execute(sql, {"list_id":list_id, "item_id":item_id})
     row_id = result.fetchone()[0]
     db.session.commit()
@@ -183,15 +198,28 @@ def save_default_list_with_name(user_id, list_name):
     return list_id
     
 
-def combine_rows(row_1, row_2):
-    combined_row = [row_1[0], row_1[1], ""]
+def remove_duplicate_rows(shopping_list_rows):
+    shopping_list_rows.sort()
+    shopping_list_combined = []
+    for i in range(len(shopping_list_rows)):
+        if i < len(shopping_list_rows)-1 and shopping_list_rows[i][0] == shopping_list_rows[i+1][0]:
+            shopping_list_rows[i+1] = combine_rows(shopping_list_rows[i], shopping_list_rows[i+1])
+        else:
+            shopping_list_combined.append(shopping_list_rows[i])
 
-    if row_1[2] == "":
-        combined_row[2] = row_2[2]
-    elif row_2[2] == "":
-        combined_row[2] = row_1[2]
+    return shopping_list_combined
+
+def combine_rows(row_1, row_2):
+
+    combined_row = [row_1[0], "", 0]
+
+    # Combine amount
+    if row_1[1] == "":
+        combined_row[1] = row_2[1]
+    elif row_2[1] == "":
+        combined_row[1] = row_1[1]
     else:
-        combined_row[2] = row_1[2] + " + " + row_2[2]
+        combined_row[1] = row_1[1] + " + " + row_2[1]
     
     return combined_row
 

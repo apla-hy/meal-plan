@@ -127,6 +127,9 @@ def plan_create_shopping_list():
     list_id = shopping_lists.get_default_list(user_id)
     save_result = shopping_lists.save_list_rows(list_id, list_rows)
 
+    # Set scroll position to the beginning of the page
+    session["scroll_pos"] = 0
+
     return redirect("/shopping_list_details/"+str(list_id))
 
 
@@ -140,6 +143,9 @@ def plan_show_default_shopping_list():
     username = users.get_username()
 
     list_id = shopping_lists.get_default_list(user_id)
+
+    # Set scroll position to the beginning of the page
+    session["scroll_pos"] = 0
 
     return redirect("/shopping_list_details/"+str(list_id))
 
@@ -187,12 +193,17 @@ def shopping_list_details(id):
     row_names = []
     row_amounts = []
     row_marks = []
+    row_class_names = []
     for list_row in list_rows:
         row_ids.append(list_row[0])
         row_names.append(list_row[2])
         row_amounts.append(list_row[3])
         row_marks.append(list_row[4])
+        row_class_names.append(list_row[6])
     item_list = items.get_item_names()
+
+    # Get list of saved shopping lists
+    saved_lists = shopping_lists.list_search("")
 
     # If session contains shopping list data, use it (there was an error in saving this data)
     if "list_name" in session:
@@ -208,7 +219,7 @@ def shopping_list_details(id):
                 row_amounts[index] = list_row[2]
         del session["list_rows"]
 
-    return render_template("shopping_list_details.html", username=username, list_id=list_id, list_name=list_name, default_list=default_list, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, row_marks=row_marks, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
+    return render_template("shopping_list_details.html", username=username, list_id=list_id, list_name=list_name, default_list=default_list, row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, row_marks=row_marks, row_class_names=row_class_names, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list), saved_lists=saved_lists)
 
 @app.route("/shopping_list_save", methods=["post"])
 def shopping_list_save():
@@ -274,6 +285,9 @@ def shopping_list_mark_row(id):
     # Toggle row mark
     result = shopping_lists.mark_row(list_id, id)
 
+    # Save scroll position to the session data
+    session["scroll_pos"] = request.form["scroll_pos"]
+
     return redirect("/shopping_list_details/"+str(list_id))    
 
 
@@ -300,6 +314,9 @@ def shopping_list_add_row():
 
     # Add row
     row_id = shopping_lists.new_row(list_id)
+
+    # Set scroll position to the beginning of the page
+    session["scroll_pos"] = 0
 
     return redirect("/shopping_list_details/"+str(list_id))
 
@@ -329,7 +346,124 @@ def shopping_list_delete_row(id):
     # Delete row
     result = shopping_lists.delete_row(list_id, id)
 
-    return redirect("/shopping_list_details/"+str(list_id))    
+    return redirect("/shopping_list_details/"+str(list_id))
+
+
+@app.route("/shopping_list_add_from_list", methods=["get","post"])
+def shopping_list_add_from_list():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Get list ids from form or session
+    if request.method == "GET":
+        list_add_from_id = session["list_add_from_id"]
+        del session["list_add_from_id"]
+        list_add_to_id = session["list_add_to_id"]
+        del session["list_add_to_id"]
+
+    if request.method == "POST":
+        list_add_from_id = request.form["list_add_from_id"]
+        list_add_to_id = request.form["list_add_to_id"]
+
+    # Get selected variable from the session data
+    rows_selected_value = 1
+    if "list_rows_selected" in session:
+        if session["list_rows_selected"] == 0:
+            rows_selected_value = 0
+            del session["list_rows_selected"]
+
+    # Get shopping list data from the database
+    list_rows = shopping_lists.get_list_rows(list_add_from_id)
+    row_checked = []
+    row_ids = []
+    row_item_ids = []
+    row_names = []
+    row_amounts = []
+    row_class_names = []
+    for list_row in list_rows:
+        row_checked.append(rows_selected_value)
+        row_ids.append(list_row[0])
+        row_item_ids.append(list_row[1])
+        row_names.append(list_row[2])
+        row_amounts.append(list_row[3])
+        row_class_names.append(list_row[6])
+
+    return render_template("shopping_list_add_from_list.html", username=username, list_add_to_id=list_add_to_id, list_add_from_id=list_add_from_id, row_checked=row_checked, row_ids=row_ids, row_item_ids=row_item_ids, row_names=row_names, row_amounts=row_amounts, row_class_names=row_class_names, number_of_rows=len(row_ids))
+
+
+@app.route("/shopping_list_add_from_list_select_rows", methods=["post"])
+def shopping_list_add_from_list_select_rows():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Get form data and store it to the session data
+    session["list_add_from_id"] = request.form["list_add_from_id"]
+    session["list_add_to_id"] = request.form["list_add_to_id"]
+
+    # Store selected status to the session data
+    session["list_rows_selected"] = 1
+
+    return redirect("/shopping_list_add_from_list")
+
+
+@app.route("/shopping_list_add_from_list_unselect_rows", methods=["post"])
+def shopping_list_add_from_list_unselect_rows():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Get form data and store it to the session data
+    session["list_add_from_id"] = request.form["list_add_from_id"]
+    session["list_add_to_id"] = request.form["list_add_to_id"]
+
+    # Store selected status to the session data
+    session["list_rows_selected"] = 0
+
+    return redirect("/shopping_list_add_from_list")
+
+
+@app.route("/shopping_list_add_from_list_save", methods=["post"])
+def shopping_list_add_from_list_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+       return redirect("/")
+    username = users.get_username()
+
+    list_id = request.form["list_add_to_id"]
+    number_of_rows = int(request.form["number_of_rows"])
+
+    # Loop all rows and store data from the selected rows
+    item_list = []
+    for i in range(number_of_rows):
+        row_id = int(request.form.get(str(i) + "_selected", default='0'))
+        if row_id != 0:
+            item_id = int(request.form.get(str(i) + "_row_item_id", default='0'))
+            amount = request.form.get(str(i) + "_row_amount", default='')
+            if item_id != 0:
+                item_list.append([item_id, amount])
+
+    # Add selected rows to the shopping list if some rows are selected
+    if len(item_list) != 0:
+        # Add rows to the target shopping list
+        list_rows = shopping_lists.add_items_from_list(list_id, item_list)
+    
+        # Save the new version of the shopping list to the database
+        save_result = shopping_lists.save_list_rows(list_id, list_rows)
+
+    return redirect("/shopping_list_details/"+str(list_id))
 
 
 @app.route("/item_new_from_shopping_list", methods=["get"])
@@ -610,6 +744,58 @@ def item_new_save():
     item_id = items.item_new(item_name, item_class)
 
     return redirect("/item_new")
+
+##################
+### Item Class ###
+##################
+
+@app.route("/item_class", methods=["get"])
+def item_class():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    item_class_list = items.get_item_classes()
+
+    row_ids = []
+    row_names = []
+    for item_class in item_class_list:
+        row_ids.append(item_class[0])
+        row_names.append(item_class[1])
+
+    return render_template("item_class.html", username=username, row_ids=row_ids, row_names=row_names, number_of_rows=len(row_ids))
+
+
+@app.route("/item_class_move_up/<int:id>", methods=["post"])
+def item_class_move_up(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    result = items.item_class_move_up(id)
+
+    return redirect("/item_class")
+
+
+@app.route("/item_class_move_down/<int:id>", methods=["post"])
+def item_class_move_down(id):
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    result = items.item_class_move_down(id)
+
+    return redirect("/item_class")
+
 
 ##############
 ### Recipe ###

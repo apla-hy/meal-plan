@@ -9,7 +9,7 @@
 <table>
   <tr>
     <td>
-      <form action="/shopping_list" method=get">
+      <form action="/shopping_list" method="get">
         <input type="submit" value="Näytä tallennetut ostoslistat">
       </form>
     </td>
@@ -20,6 +20,31 @@
     {% endif %}
   </tr>
 </table>
+
+<br>
+
+<form action="/shopping_list_add_from_list" method="post">
+<input type="hidden" name="list_add_to_id" value={{list_id}}>
+<table>
+  <tr>
+    <td>
+      <label>Valitse tallennettu ostoslista:</label>
+    </td>
+    <td>
+      <select name="list_add_from_id">
+        {% for i in range(saved_lists | length) %}
+          {% if saved_lists[i][0] != list_id %}
+            <option value={{saved_lists[i][0]}}>{{saved_lists[i][1]}}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </td>
+    <td>
+      <input type="submit" value="Lisää nimikkeitä valitulta listalta">
+    </td>
+  </tr>
+</table>
+</form>
 
 <br>
 
@@ -39,7 +64,13 @@
 
 <br>
 
-<form action="/shopping_list_save" id="form_main" method="post">
+<form action="/shopping_list_save" id="form_main" method="post" onsubmit="setScrollPosition()" >
+
+{% if 'scroll_pos' in session %}
+  <input type="hidden" name="scroll_pos" id="scroll_pos" value={{session['scroll_pos']}}>
+{% else %}
+  <input type="hidden" name="scroll_pos" id="scroll_pos" value=0>
+{% endif %}
 
 {% if default_list != True %}
 <table>
@@ -74,18 +105,27 @@
       </th>
     </tr>
     {% for i in range(number_of_rows) %}
+      {% if i == 0 or row_class_names[i] != row_class_names[i-1] %}
+      <tr><td></td></tr>
+      <tr>
+        <td colspan="3">
+          <label><i>{{row_class_names[i]}}</i></label>
+        </td>
+      </tr>
+      {% endif %}
       <tr>
         <td>
           <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
         </td>
         <td>
-          <input type="image" src="/static/images/checked.png" alt="Merkitse ostetuksi" width="18" height="18" formaction="/shopping_list_mark_row/{{row_ids[i]}}" title="Merkitse ostetuksi tai poista merkintä" >        </td>
+          <input type="image" src="/static/images/checked.png" alt="Merkitse ostetuksi" width="18" height="18" formaction="/shopping_list_mark_row/{{row_ids[i]}}" title="Merkitse ostetuksi tai poista merkintä" >
+        </td>
         <td>
           <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}"
           {% if row_marks[i] == 1 %} style="text-decoration: line-through; color:Gray;" {% endif %} />
         </td>
         <td>
-          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}" tabindex={{i+1}}
+          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"
             {% if row_marks[i] == 1 %}style="text-decoration: line-through; color:Gray;"{% endif %} >
         </td>
         <td>
@@ -115,5 +155,22 @@
       </td>
     </tr>
   </table>
+
+<script>
+
+function setScrollPosition() {
+  var scroll_position = window.pageYOffset;
+  document.getElementById("scroll_pos").value = scroll_position;
+}
+
+function scrollToScrollPosition() {
+  var scroll_position = document.getElementById("scroll_pos").value;
+  window.scrollBy(0, scroll_position);
+  document.getElementById("scroll_pos").value = 0;
+}
+
+window.onload = scrollToScrollPosition();
+
+</script>
 
 {% endblock %}

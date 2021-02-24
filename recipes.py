@@ -48,6 +48,11 @@ def get_recipe_row(recipe_id, row_id):
     recipe_row = result.fetchone()
     return recipe_row
 
+def get_recipe_rows_with_classes(recipe_id):
+    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount, IC.id, IC.name FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id LEFT JOIN item_classes IC ON I.class_id=IC.id WHERE RR.recipe_id=:recipe_id ORDER BY RR.id"
+    result = db.session.execute(sql, {"recipe_id":recipe_id})
+    recipe_rows = result.fetchall()
+    return recipe_rows
 
 def save_header(recipe_id, recipe_name):
     try:
