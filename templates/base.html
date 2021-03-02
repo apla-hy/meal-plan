@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+
+<link rel="stylesheet" href="/static/main.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <html>
 
 <title>{% block title %}{% endblock %} - Ruokasuunnittelu</title>
@@ -7,17 +11,19 @@
 <body>
 
 <nav>
-<a href="/">Ruokasuunnittelu</a> |
-{% if session.user_id %}
-  <a href="/shopping_list">Tallennetut ostoslistat</a> |
-  <a href="/recipe">Reseptit</a> |
-  <a href="/item">Nimikkeet</a> |
-  <a href="/item_class">Nimikeluokat</a> |
-  <a href="/profile">Omat tiedot - {{ username }}</a> |
-  <a href="/logout">Kirjaudu ulos</a>
-{% else %}
-    <a href="/login">Kirjaudu sisään</a>
-{% endif %}
+  <ul>
+    <li><a href="/">Ruokasuunnittelu</a></li>
+    {% if session.user_id %}
+    <li><a href="/shopping_list">Tallennetut ostoslistat</a></li>
+    <li><a href="/recipe">Reseptit</a></li>
+    <li><a href="/item">Nimikkeet</a></li>
+    <li><a href="/item_class">Nimikeluokat</a></li>
+    <li style="float:right"><a href="/logout">Kirjaudu ulos</a></li>
+    <li style="float:right"><a href="/profile">Omat tiedot - {{ username }}</a></li>
+    {% else %}
+    <li style="float:right"><a href="/login">Kirjaudu sisään</a></li>
+    {% endif %}
+  </ul>
 </nav>
 
 <section class="content">
