@@ -31,12 +31,12 @@
     {% block header %}{% endblock %}
   </header>
   {% block content %}{% endblock %}
-</section>
 
 <br>
 {% for message in get_flashed_messages() %}
 <p>{{ message }}</p>
 {% endfor %}
+</section>
 
 </body>
 </html>

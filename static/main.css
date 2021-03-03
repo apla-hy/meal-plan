@@ -14,7 +14,7 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #6495ed;
+  background-color: #5c5c5c;
 }
 
 li {
@@ -27,11 +27,10 @@ li a {
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-  border-radius: .5em;
 }
 
 li a:hover {
-  background-color: #4f86f7;
+  background-color: #3d3d3d;
 }
 
 

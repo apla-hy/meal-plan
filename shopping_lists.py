@@ -60,7 +60,7 @@ def get_default_list(user_id):
     result = db.session.execute(sql, {"user_id":user_id})
     list_id = result.fetchone()
     # If not, create default plan
-    if list_id == None:
+    if not list_id:
         sql = "INSERT INTO shopping_lists (user_id, default_list, name) VALUES (:user_id,1, '') RETURNING id"
         result = db.session.execute(sql, {"user_id":user_id})
         list_id = result.fetchone()

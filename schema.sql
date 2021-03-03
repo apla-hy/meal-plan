@@ -55,7 +55,7 @@ CREATE TABLE shopping_lists (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users,
     default_list INTEGER,
-    name TEXT UNIQUE
+    name TEXT
 );
 
 CREATE TABLE shopping_list_rows (
