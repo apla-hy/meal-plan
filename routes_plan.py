@@ -137,6 +137,8 @@ def plan_save_rows():
 
     if error_rows > 0:
         flash(str(error_rows) + " rivin tallennus ei onnistunut")
+    else:
+        flash("Suunnitelma tallennettu")
 
     return redirect("/plan")
 
@@ -174,11 +176,16 @@ def plan_create_shopping_list():
     
     # Save shopping list to the database
     list_id = shopping_lists.get_default_list(user_id)
-    save_result = shopping_lists.save_list_rows(list_id, list_rows)
+    if not list_id:
+        return redirect("/error")
+    if not shopping_lists.save_list_rows(list_id, list_rows):
+        flash("Ostoslista luonti ei onnistunut")
+        return redirect("/plan")
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
 
+    # Show shopping list
     return redirect("/shopping_list_details/"+str(list_id))
 
 
@@ -192,10 +199,13 @@ def plan_show_default_shopping_list():
     username = users.get_username()
 
     list_id = shopping_lists.get_default_list(user_id)
+    if not list_id:
+        return redirect("/error")
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
 
+    # Show shopping list
     return redirect("/shopping_list_details/"+str(list_id))
 
 

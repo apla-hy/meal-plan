@@ -5,11 +5,18 @@ import items
 import recipes
 
 
-def list_search(query):
-    sql = "SELECT id, name FROM shopping_lists WHERE LOWER(name) LIKE LOWER(:query) AND default_list=0 ORDER BY name"
-    result = db.session.execute(sql, {"query":"%"+query+"%"})
+def list_search(user_id, query):
+    sql = "SELECT id, name FROM shopping_lists WHERE LOWER(name) LIKE LOWER(:query) AND default_list=0 AND user_id=:user_id ORDER BY name"
+    result = db.session.execute(sql, {"query":"%"+query+"%", "user_id":user_id})
     lists = result.fetchall()
     return lists
+
+def is_list_owner(user_id, list_id):
+    sql = "SELECT 1 FROM shopping_lists WHERE id=:list_id AND user_id=:user_id"
+    result = db.session.execute(sql, {"list_id":list_id, "user_id":user_id})
+    if result.fetchone() != None:
+        return True
+    return False
 
 def get_list(list_id):
     sql = "SELECT id, name FROM shopping_lists WHERE id=:list_id"
@@ -61,10 +68,14 @@ def get_default_list(user_id):
     list_id = result.fetchone()
     # If not, create default plan
     if not list_id:
-        sql = "INSERT INTO shopping_lists (user_id, default_list, name) VALUES (:user_id,1, '') RETURNING id"
-        result = db.session.execute(sql, {"user_id":user_id})
-        list_id = result.fetchone()
-        db.session.commit()
+        try:
+            sql = "INSERT INTO shopping_lists (user_id, default_list, name) VALUES (:user_id,1, '') RETURNING id"
+            result = db.session.execute(sql, {"user_id":user_id})
+            list_id = result.fetchone()
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return False
     return list_id[0]
 
 
@@ -91,15 +102,23 @@ def add_items_from_list(list_id, item_list):
 def save_list_rows(list_id, list_rows):
 
     # Delete old rows
-    sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:list_id"
-    result = db.session.execute(sql, {"list_id":list_id})
-    db.session.commit()
+    try:
+        sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:list_id"
+        result = db.session.execute(sql, {"list_id":list_id})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
 
     # Add new rows
     sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:list_id, :item_id, :amount, :marked)"
     for row in list_rows:
-        result = db.session.execute(sql, {"list_id":list_id, "item_id":row[0], "amount":row[1], "marked":row[2]})
-        db.session.commit()
+        try:
+            result = db.session.execute(sql, {"list_id":list_id, "item_id":row[0], "amount":row[1], "marked":row[2]})
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return False
     
     return True
 
@@ -114,17 +133,14 @@ def mark_row(list_id, row_id):
     if row_marked:
         mark_value = 0
 
-    try:
-        sql = "UPDATE shopping_list_rows SET marked=:mark_value WHERE shopping_list_id=:list_id AND id=:row_id"
-        db.session.execute(sql, {"list_id":list_id, "row_id":row_id, "mark_value":mark_value})
-        db.session.commit()
-    except:
-        return False
-    return True
+    sql = "UPDATE shopping_list_rows SET marked=:mark_value WHERE shopping_list_id=:list_id AND id=:row_id"
+    db.session.execute(sql, {"list_id":list_id, "row_id":row_id, "mark_value":mark_value})
+    db.session.commit()
+
+    return
 
 
 def delete_row(list_id, row_id):
-
     try:
         sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:list_id AND id=:row_id"
         db.session.execute(sql, {"list_id":list_id, "row_id":row_id})
@@ -144,13 +160,11 @@ def save_header(list_id, list_name):
     return True
 
 def save_row(row_id, item_name, amount):
-
     # Find id for the item
     sql = "SELECT id FROM items WHERE name=:name"
     result = db.session.execute(sql, {"name":item_name})
     item_id = result.fetchone()
     if item_id == None:
-        print("Virhe: valittua nimikettä ei löydy")
         return False
     else:
         item_id = item_id[0]
@@ -164,10 +178,14 @@ def save_row(row_id, item_name, amount):
 
 def new_row(list_id):
     item_id = items.get_default_item_id()
-    sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount) VALUES (:list_id, :item_id, '', 0) RETURNING id"
-    result = db.session.execute(sql, {"list_id":list_id, "item_id":item_id})
-    row_id = result.fetchone()[0]
-    db.session.commit()
+    try:
+        sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:list_id, :item_id, '', 0) RETURNING id"
+        result = db.session.execute(sql, {"list_id":list_id, "item_id":item_id})
+        row_id = result.fetchone()[0]
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
 
     return row_id
 
@@ -190,11 +208,14 @@ def save_default_list_with_name(user_id, list_name):
         return False
     list_rows = get_list_rows(default_list_id) # Row.id, Row.item_id, Item.name, Row.amount, Row.marked
     for list_row in list_rows:
-            sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:list_id, :item_id, :amount, :marked) RETURNING id"
-            result = db.session.execute(sql, {"list_id":list_id, "item_id":list_row[1], "amount":list_row[3], "marked":list_row[4]})
-            row_id = result.fetchone()[0]
-            db.session.commit()
-     
+            try:
+                sql = "INSERT INTO shopping_list_rows (shopping_list_id, item_id, amount, marked) VALUES (:list_id, :item_id, :amount, :marked) RETURNING id"
+                result = db.session.execute(sql, {"list_id":list_id, "item_id":list_row[1], "amount":list_row[3], "marked":list_row[4]})
+                row_id = result.fetchone()[0]
+                db.session.commit()
+            except:
+                db.session.rollback()
+                return False
     return list_id
     
 

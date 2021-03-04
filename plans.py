@@ -79,7 +79,7 @@ def get_selected_recipes(plan_id):
                     if recipe_list[k][1] == recipe[j]:
                         selected_recipes_list[i][j] = recipe_list[k][0]
                         break
-                # If recipe name is empty use data from the notes field
+                # If recipe name is empty, use data from the notes field
                 if selected_recipes_list[i][j] == "" and recipe[j+3] != None:
                     selected_recipes_list[i][j] = recipe[j+3]
     return selected_recipes_list

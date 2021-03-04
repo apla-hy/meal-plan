@@ -15,7 +15,9 @@
     </td>
     {% if default_list == True %}
     <td>
-      <input type="submit" value="Tallenna ostoslista nimellä" form="form_main" formaction="/shopping_list_new_from_default" >
+      <form action="/shopping_list_new_from_default" method="get">
+        <input type="submit" value="Tallenna ostoslista nimellä">
+      </form>
     </td>
     {% endif %}
   </tr>
@@ -121,11 +123,11 @@
           <input type="image" src="/static/images/checked.png" alt="Merkitse ostetuksi" width="18" height="18" formaction="/shopping_list_mark_row/{{row_ids[i]}}" title="Merkitse ostetuksi tai poista merkintä" >
         </td>
         <td>
-          <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}"
+          <input type="text" name="{{i}}_row_name" list="item_names" value="{{ row_names[i] }}" tabindex="{{i*2+1}}"
           {% if row_marks[i] == 1 %} style="text-decoration: line-through; color:Gray;" {% endif %} />
         </td>
         <td>
-          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}"
+          <input type="text" name="{{i}}_row_amount" value="{{row_amounts[i]}}" tabindex="{{i*2+2}}"
             {% if row_marks[i] == 1 %}style="text-decoration: line-through; color:Gray;"{% endif %} >
         </td>
         <td>
