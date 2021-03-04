@@ -581,4 +581,26 @@ def shopping_list_new_from_default_save():
 
     return redirect("/shopping_list_details/"+str(list_id))
 
+@app.route("/shopping_list_delete", methods=["post"])
+def shopping_list_delete():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+    
+    # Validate data
+    try:
+        list_id = int(request.form["list_id"])
+    except:
+        return redirect("/error")
+
+    # Delete list
+    if shopping_lists.delete_list(user_id, list_id):
+        flash("Lista on poistettu")
+    else:
+        flash("Listan poistaminen ei onnistunut")
+
+    return redirect("/shopping_list")
 

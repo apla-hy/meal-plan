@@ -19,6 +19,13 @@
         <input type="submit" value="Tallenna ostoslista nimellä">
       </form>
     </td>
+    {% else %}
+    <td>
+      <form action="/shopping_list_delete" method="post">
+        <input type="hidden" name="list_id" value="{{ list_id }}">
+        <input type="submit" value="Poista lista">
+      </form>
+    </td>
     {% endif %}
   </tr>
 </table>

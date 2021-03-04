@@ -149,6 +149,25 @@ def delete_row(list_id, row_id):
         return False
     return True
 
+def delete_list(user_id, list_id):
+    # Check that list exists, user is the owner and list is not the default list
+    sql = "SELECT default_list FROM shopping_lists WHERE id=:list_id AND user_id=:user_id"
+    result = db.session.execute(sql, {"list_id":list_id, "user_id":user_id})
+    default_value = result.fetchone()
+    if default_value == None or default_value[0] == 1:
+        return False
+    try:
+        sql = "DELETE FROM shopping_list_rows WHERE shopping_list_id=:list_id"
+        db.session.execute(sql, {"list_id":list_id})
+        sql = "DELETE FROM shopping_lists WHERE id=:list_id"
+        db.session.execute(sql, {"list_id":list_id})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
+    return True
+
+
 
 def save_header(list_id, list_name):
     try:
