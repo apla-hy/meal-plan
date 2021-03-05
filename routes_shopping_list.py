@@ -564,6 +564,9 @@ def shopping_list_new_from_default_save():
         return redirect("/")
     username = users.get_username()
 
+    # Set scroll position to the beginning of the page
+    session["scroll_pos"] = 0
+
     # Validate form data
     try:
         list_name = request.form["shopping_list_name"]

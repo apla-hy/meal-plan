@@ -37,19 +37,22 @@ def get_recipe(recipe_id):
     return recipe
 
 def get_recipe_rows(recipe_id):
-    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id WHERE RR.recipe_id=:recipe_id ORDER BY RR.id"
+    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id \
+        WHERE RR.recipe_id=:recipe_id ORDER BY RR.id"
     result = db.session.execute(sql, {"recipe_id":recipe_id})
     recipe_rows = result.fetchall()
     return recipe_rows
 
 def get_recipe_row(recipe_id, row_id):
-    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id WHERE RR.recipe_id=:recipe_id AND RR.id=:row_id ORDER BY RR.id"
+    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id \
+       WHERE RR.recipe_id=:recipe_id AND RR.id=:row_id ORDER BY RR.id"
     result = db.session.execute(sql, {"recipe_id":recipe_id, "row_id":row_id})
     recipe_row = result.fetchone()
     return recipe_row
 
 def get_recipe_rows_with_classes(recipe_id):
-    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount, IC.id, IC.name FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id LEFT JOIN item_classes IC ON I.class_id=IC.id WHERE RR.recipe_id=:recipe_id ORDER BY RR.id"
+    sql = "SELECT RR.id, RR.item_id, I.name AS item_name, RR.amount, IC.id, IC.name FROM recipe_rows RR LEFT JOIN items I ON RR.item_id=I.id \
+        LEFT JOIN item_classes IC ON I.class_id=IC.id WHERE RR.recipe_id=:recipe_id ORDER BY RR.id"
     result = db.session.execute(sql, {"recipe_id":recipe_id})
     recipe_rows = result.fetchall()
     return recipe_rows
@@ -60,6 +63,7 @@ def save_header(recipe_id, recipe_name):
         db.session.execute(sql, {"recipe_id":recipe_id, "name":recipe_name})
         db.session.commit()
     except:
+        db.session.rollback()
         return False
     return True
         
@@ -71,38 +75,47 @@ def save_row(row_id, item_name, amount):
     result = db.session.execute(sql, {"name":item_name})
     item_id = result.fetchone()
     if item_id == None:
-        print("Virhe: valittua nimikettä ei löydy")
         return False
     else:
         item_id = item_id[0]
 
     # Update recipe row data to the database
-    sql = "UPDATE recipe_rows SET amount=:amount, item_id=:item_id WHERE id=:row_id"
-    
-    db.session.execute(sql, {"row_id":row_id, "item_id":item_id, "amount":amount})
-    db.session.commit()
+    try:
+        sql = "UPDATE recipe_rows SET amount=:amount, item_id=:item_id WHERE id=:row_id"
+        db.session.execute(sql, {"row_id":row_id, "item_id":item_id, "amount":amount})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
 
     return True
 
 def new_row(recipe_id):
     item_id = items.get_default_item_id()
-    sql = "INSERT INTO recipe_rows (recipe_id, item_id, amount) VALUES (:recipe_id, :item_id, '') RETURNING id"
-    result = db.session.execute(sql, {"recipe_id":recipe_id, "item_id":item_id})
-    row_id = result.fetchone()[0]
-    db.session.commit()
+    try:
+        sql = "INSERT INTO recipe_rows (recipe_id, item_id, amount) VALUES (:recipe_id, :item_id, '') RETURNING id"
+        result = db.session.execute(sql, {"recipe_id":recipe_id, "item_id":item_id})
+        row_id = result.fetchone()[0]
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
 
     return row_id
 
 def delete_row(recipe_id, row_id):
-    sql = "DELETE FROM recipe_rows WHERE recipe_id=:recipe_id AND id=:row_id"
-    db.session.execute(sql, {"recipe_id":recipe_id, "row_id":row_id})
-    db.session.commit()
-
+    try:
+        sql = "DELETE FROM recipe_rows WHERE recipe_id=:recipe_id AND id=:row_id"
+        db.session.execute(sql, {"recipe_id":recipe_id, "row_id":row_id})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
     return True
 
 def new_recipe(recipe_name):
     try:
-        sql = "INSERT INTO recipes (name) VALUES (:name) RETURNING id"
+        sql = "INSERT INTO recipes (name, default_recipe) VALUES (:name, 0) RETURNING id"
         result = db.session.execute(sql, {"name":recipe_name})
         recipe_id = result.fetchone()[0]
         db.session.commit()
