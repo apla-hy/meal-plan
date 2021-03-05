@@ -49,6 +49,7 @@ def update_profile(username,password):
         db.session.execute(sql, {"username":username,"password":hash_value,"id":user_id})
         db.session.commit()
     except:
+        db.session.rollback()
         return False
     return True
 

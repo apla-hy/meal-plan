@@ -115,6 +115,9 @@ def shopping_list_save():
         if len(list_name) > 50:
             flash("Ostoslistan nimen pituus ei voi olla yli 50 merkkiä")
             return redirect("/shopping_list_details/"+str(list_id))
+        if len(list_name) == 0:
+            flash("Ostoslistan nimi ei voi olla tyhjä")
+            return redirect("/shopping_list_details/"+str(list_id))
         if not shopping_lists.save_header(list_id, list_name):
             error = True
             session["list_name"] = list_name

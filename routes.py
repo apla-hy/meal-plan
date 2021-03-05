@@ -12,11 +12,9 @@ def index():
     else:
         return render_template("index.html")
 
-
 @app.route("/error")
 def error():
     return render_template("error.html")
-
 
 ############
 ### User ###
@@ -32,7 +30,8 @@ def login():
         if users.login(username,password):
             return redirect("/")
         else:
-            return render_template("error.html",message="Väärä tunnus tai salasana")
+            flash("Väärä tunnus tai salasana")
+            return redirect("/login")
 
 @app.route("/logout")
 def logout():
@@ -49,7 +48,6 @@ def register():
         password_check = request.form["password_check"]
 
         # Check that passwords are the same
-        password_check = request.form["password_check"]
         if password != password_check:
             flash("Salasanat eivät ole samat")
             return redirect("/register")
@@ -57,6 +55,11 @@ def register():
         # Check password length
         if len(password) < 4:
             flash("Salasana on liian lyhyt")
+            return redirect("/register")
+
+       # Check username length
+        if len(username) < 4:
+            flash("Käyttäjätunnus on liian lyhyt")
             return redirect("/register")
 
         # Register user
@@ -78,6 +81,7 @@ def profile():
 
     if request.method == "GET":
         return render_template("profile.html",username=username)
+
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -92,6 +96,11 @@ def profile():
         if len(password) < 4:
             flash("Salasana on liian lyhyt")
             return redirect("/profile")
+
+       # Check username length
+        if len(username) < 4:
+            flash("Käyttäjätunnus on liian lyhyt")
+            return redirect("/register")
 
         # Save profile data
         if users.update_profile(username,password):
@@ -126,7 +135,7 @@ def item():
     return render_template("item.html", username=username, items=item_list, number_of_items=len(item_list))
 
 @app.route("/item_details/<int:id>", methods=["get"])
-def item_modify(id):
+def item_details(id):
 
     # Check that there is an active session
     user_id = users.get_user_id()
@@ -136,11 +145,14 @@ def item_modify(id):
 
     item_id = id
     item = items.get_item(item_id)
+    if not item:
+        return redirect("/error")
     item_name = item[1]
     item_class = item[3]
     class_list = items.get_class_names()
 
-    return render_template("item_details.html", username=username, item_id=item_id, item_name=item_name, item_class=item_class, class_list=class_list, number_of_classes=len(class_list))
+    return render_template("item_details.html", username=username, item_id=item_id, item_name=item_name, item_class=item_class, \
+        class_list=class_list, number_of_classes=len(class_list))
 
 @app.route("/item_save", methods=["post"])
 def item_save():
@@ -151,10 +163,25 @@ def item_save():
         return redirect("/")
     username = users.get_username()
 
-    item_id = request.form["item_id"]
-    item_name = request.form["item_name"]
-    item_class = request.form["item_class"]
-    items.item_change(item_id, item_name, item_class)
+    # Validate form data
+    try:
+        item_id = int(request.form["item_id"])
+        item_name = request.form["item_name"]
+        item_class = request.form["item_class"]
+    except:
+        return redirect("/error")
+    if len(item_name) > 50:
+        flash("Nimikkeen nimi on liian pitkä")
+        return redirect("/item_details/"+str(item_id))    
+    if len(item_name) == 0:
+        flash("Nimikkeen nimi ei voi olla tyhjä")
+        return redirect("/item_details/"+str(item_id))    
+        
+    # Save data
+    if items.item_change(item_id, item_name, item_class):
+        flash("Tallennettu")
+    else:
+        flash("Tallennus ei onnistunut")
 
     return redirect("/item_details/"+str(item_id))
 
@@ -181,9 +208,23 @@ def item_new_save():
         return redirect("/")
     username = users.get_username()
 
-    item_name = request.form["item_name"]
-    item_class = request.form["item_class"]
-    item_id = items.item_new(item_name, item_class)
+    # Validate form data
+    try:
+        item_name = request.form["item_name"]
+        item_class = request.form["item_class"]
+    except:
+        return redirect("/error")
+    if len(item_name) > 50:
+        flash("Nimikkeen nimi on liian pitkä")
+        return redirect("/item_new")    
+    if len(item_name) == 0:
+        flash("Nimikkeen nimi ei voi olla tyhjä")
+        return redirect("/item_new")    
+
+    if items.item_new(item_name, item_class):
+        flash("Nimike lisätty")
+    else:
+        flash("Nimikkeen lisäys ei onnistunut")
 
     return redirect("/item_new")
 

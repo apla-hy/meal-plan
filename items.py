@@ -103,10 +103,13 @@ def item_change(item_id, item_name, item_class):
     sql = "SELECT id FROM item_classes WHERE name=:item_class"
     result = db.session.execute(sql, {"item_class":item_class})
     item_class_id = result.fetchone()[0]
-
-    sql = "UPDATE items SET name=:name, class_id=:class_id WHERE id=:id"
-    db.session.execute(sql, {"id":item_id, "name":item_name, "class_id":item_class_id})
-    db.session.commit()
+    try:
+        sql = "UPDATE items SET name=:name, class_id=:class_id WHERE id=:id"
+        db.session.execute(sql, {"id":item_id, "name":item_name, "class_id":item_class_id})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
 
     return True    
 
@@ -114,11 +117,14 @@ def item_new(item_name, item_class):
     sql = "SELECT id FROM item_classes WHERE name=:item_class"
     result = db.session.execute(sql, {"item_class":item_class})
     item_class_id = result.fetchone()[0]
-
-    sql = "INSERT INTO items (name, class_id, default_item) VALUES (:name, :class_id, 0) RETURNING id"
-    result = db.session.execute(sql, {"name":item_name, "class_id":item_class_id})
-    item_id = result.fetchone()[0]
-    db.session.commit()
+    try:
+        sql = "INSERT INTO items (name, class_id, default_item) VALUES (:name, :class_id, 0) RETURNING id"
+        result = db.session.execute(sql, {"name":item_name, "class_id":item_class_id})
+        item_id = result.fetchone()[0]
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
 
     return item_id
 
