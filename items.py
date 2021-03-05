@@ -65,7 +65,7 @@ def item_class_move_up(class_id):
             result = db.session.execute(sql, {"class_order":current_row_order, "id":previous_row_id})
             db.session.commit()
     
-    return True
+    return
 
 def item_class_move_down(class_id):
     sql = "SELECT id, name, class_order FROM item_classes ORDER BY class_order"
@@ -87,8 +87,32 @@ def item_class_move_down(class_id):
             result = db.session.execute(sql, {"class_order":current_row_order, "id":next_row_id})
             db.session.commit()
     
+    return
+
+def save_class(class_id, class_name):
+    try:
+        sql = "UPDATE item_classes SET name=:class_name WHERE id=:class_id"
+        result = db.session.execute(sql, {"class_id":class_id, "class_name":class_name})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
     return True
 
+def new_class(class_name):
+    # Get next free value for class_order
+    sql = "SELECT MAX(class_order) FROM item_classes"
+    result = db.session.execute(sql)
+    order_value = result.fetchone()[0]+1
+    try:
+        sql = "INSERT INTO item_classes (name, class_order) VALUES (:class_name, :order_value)"
+        result = db.session.execute(sql, {"class_name":class_name, "order_value":order_value})
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return False
+
+    return True
 
 
 def is_default_item(item_id):

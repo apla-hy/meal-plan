@@ -261,7 +261,7 @@ def item_class_move_up(id):
         return redirect("/")
     username = users.get_username()
 
-    result = items.item_class_move_up(id)
+    items.item_class_move_up(id)
 
     return redirect("/item_class")
 
@@ -275,9 +275,70 @@ def item_class_move_down(id):
         return redirect("/")
     username = users.get_username()
 
-    result = items.item_class_move_down(id)
+    items.item_class_move_down(id)
 
     return redirect("/item_class")
 
 
+@app.route("/item_class_save", methods=["post"])
+def item_class_save():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Validate form data
+    try:
+        number_of_rows = int(request.form["number_of_rows"])
+    except:
+        return redirect("/error")
+
+    # Save classes
+    error = False
+    for i in range(number_of_rows):
+        try:
+            class_id = int(request.form[str(i) + "_row_id"])
+            class_name = request.form[str(i) + "_row_name"]
+        except:
+            return redirect("/error")
+        if len(class_name) > 50:
+            error = True
+            flash("Luokan nimi on liian pitkä")
+            return redirect("/item_class")
+        if not items.save_class(class_id, class_name):
+            error = True
+            flash(str(i+1) + ". rivin tallentaminen ei onnistunut")
+
+    if not error:
+        flash("Tallennus onnistui")
+
+    return redirect("/item_class")
+
+
+@app.route("/item_class_new", methods=["post"])
+def item_class_new():
+
+    # Check that there is an active session
+    user_id = users.get_user_id()
+    if not user_id:
+        return redirect("/")
+    username = users.get_username()
+
+    # Validate form data
+    try:
+        class_name = request.form["item_class_new_name"]
+    except:
+        return redirect("/error")
+    if len(class_name) > 50:
+        flash("Luokan nimi on liian pitkä")
+
+    # Add new item class
+    if items.new_class(class_name):
+        flash("Luokan lisäys onnistui")
+    else:
+        flash("Luokan lisäys ei onnistunut")
+
+    return redirect("/item_class")
 

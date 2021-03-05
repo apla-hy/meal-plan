@@ -15,10 +15,15 @@
     </td>
   </tr>
 </table>
+
+<br>
+
 <table>
   <tr>
     <td>
-      <form action="/item_class_new" method="get">
+      <form action="/item_class_new" method="post">
+        <label>Uuden nimikeluokan nimi: </label>
+        <input type="text" name="item_class_new_name" value="">
         <input type="submit" value="Lisää uusi nimikeluokka">
       </form>
     </td>
@@ -40,7 +45,7 @@
       <input type="hidden" name="{{i}}_row_id" value={{row_ids[i]}}>
     </td>
     <td>
-      <input type="text" value="{{ row_names[i] }}" >
+      <input type="text" name="{{i}}_row_name" value="{{ row_names[i] }}" >
     </td>
     <td>
       <input type="image" src="/static/images/up.png" alt="Siirrä ylöspäin" width="18" height="18" formaction="/item_class_move_up/{{row_ids[i]}}" title="Siirrä ylöspäin" >
@@ -55,6 +60,7 @@
 
 <br>
 
+<input type="hidden" name="number_of_rows" value={{number_of_rows}}>
 <input type="submit" value="Tallenna">
 
 </form>
