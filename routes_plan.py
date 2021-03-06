@@ -1,19 +1,18 @@
 from app import app
-from flask import render_template, request, redirect, session, flash
+from flask import render_template, request, redirect, session, flash, abort
 import users
 import plans
 import recipes
 import shopping_lists
 
 
-@app.route("/plan")
+@app.route("/plan", methods=["get"])
 def plan():
 
     # Check that there is an active session
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Get the default plan id of the user
     plan_id = plans.get_default_plan(user_id)
@@ -38,7 +37,7 @@ def plan():
     selected_recipes = plans.get_selected_recipes(plan_id)
 
     # Show the plan page
-    return render_template("plan.html", username=username, plan_id=plan_id, startdate=startdate, period=period, dates=dates, \
+    return render_template("plan.html", plan_id=plan_id, startdate=startdate, period=period, dates=dates, \
         weekdays=weekdays, recipes=recipe_list, selected_recipes=selected_recipes, notes=notes)
 
 @app.route("/plan_change_date", methods=["post"])
@@ -48,7 +47,9 @@ def plan_change_date():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -73,7 +74,9 @@ def plan_change_period():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -102,8 +105,9 @@ def plan_save_rows():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
-
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form header data
     try:
@@ -149,7 +153,9 @@ def plan_create_shopping_list():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -196,7 +202,9 @@ def plan_show_default_shopping_list():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     list_id = shopping_lists.get_default_list(user_id)
     if not list_id:

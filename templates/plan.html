@@ -14,6 +14,7 @@
         <input type="date" name="startdate" value={{ startdate }}>
         <input type="submit" value="Vaihda aloituspäivä">
         <input type="hidden" name="plan_id" value="{{ plan_id }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       </form>
     </td>
     <td>
@@ -22,6 +23,7 @@
         <input type="number" name="period" value={{ period }}>
         <input type="submit" value="Vaihda suunnittelujakso">
         <input type="hidden" name="plan_id" value="{{ plan_id }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       </form>
     </td>
   </tr>
@@ -68,12 +70,14 @@
   <tr>
     <td>
       <input type="hidden" name="plan_id" value="{{ plan_id }}">
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       <input type="submit" value="Tallenna suunnitelma">
       <button type="submit" formaction="/plan_create_shopping_list">Luo ostoslista</button>
       </form>
     </td>
     <td>
       <form action="/plan_show_default_shopping_list" method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" value="Näytä viimeisin luotu ostoslista">
       </form>  
     </td>

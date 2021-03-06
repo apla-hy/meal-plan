@@ -11,7 +11,6 @@ def shopping_list():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
@@ -23,7 +22,7 @@ def shopping_list():
     lists = shopping_lists.list_search(user_id, query)
 
     # Show page
-    return render_template("shopping_list.html",username=username, lists=lists, number_of_lists=len(lists))
+    return render_template("shopping_list.html", lists=lists, number_of_lists=len(lists))
 
 @app.route("/shopping_list_details/<int:id>", methods=["get"])
 def shopping_list_details(id):
@@ -32,7 +31,6 @@ def shopping_list_details(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Check shopping list owner
     list_id = id
@@ -81,7 +79,7 @@ def shopping_list_details(id):
         del session["list_rows"]
 
     # Show page
-    return render_template("shopping_list_details.html", username=username, list_id=list_id, list_name=list_name, default_list=default_list, \
+    return render_template("shopping_list_details.html", list_id=list_id, list_name=list_name, default_list=default_list, \
         row_ids=row_ids, row_names=row_names, row_amounts=row_amounts, row_marks=row_marks, row_class_names=row_class_names, \
         number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list), saved_lists=saved_lists)
 
@@ -92,7 +90,10 @@ def shopping_list_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Save scroll position to the session data
     session["scroll_pos"] = request.form["scroll_pos"]
@@ -157,7 +158,9 @@ def shopping_list_mark_row(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Save scroll position to the session data
     session["scroll_pos"] = request.form["scroll_pos"]
@@ -205,7 +208,9 @@ def shopping_list_add_row():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
@@ -250,7 +255,9 @@ def shopping_list_delete_row(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Save scroll position to the session data
     session["scroll_pos"] = request.form["scroll_pos"]
@@ -299,7 +306,10 @@ def shopping_list_add_from_list():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if request.method == "POST":
+        if session["csrf_token"] != request.form["csrf_token"]:
+            abort(403)
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
@@ -347,7 +357,7 @@ def shopping_list_add_from_list():
         row_class_names.append(list_row[6])
 
     # Show page
-    return render_template("shopping_list_add_from_list.html", username=username, list_add_to_id=list_add_to_id, \
+    return render_template("shopping_list_add_from_list.html", list_add_to_id=list_add_to_id, \
         list_add_from_id=list_add_from_id, row_checked=row_checked, row_ids=row_ids, row_item_ids=row_item_ids, \
         row_names=row_names, row_amounts=row_amounts, row_class_names=row_class_names, number_of_rows=len(row_ids))
 
@@ -359,7 +369,9 @@ def shopping_list_add_from_list_select_rows():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -385,7 +397,9 @@ def shopping_list_add_from_list_unselect_rows():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -411,7 +425,9 @@ def shopping_list_add_from_list_save():
     user_id = users.get_user_id()
     if not user_id:
        return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate from data
     try:
@@ -451,7 +467,6 @@ def item_new_from_shopping_list():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
@@ -472,7 +487,9 @@ def item_modify_from_shopping_list(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Save scroll position to the session data
     session["scroll_pos"] = request.form["scroll_pos"]
@@ -508,10 +525,9 @@ def shopping_list_new():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Open page to get name for the new list
-    return render_template("shopping_list_new.html", username=username)
+    return render_template("shopping_list_new.html")
 
 
 @app.route("/shopping_list_new_save", methods=["post"])
@@ -521,7 +537,9 @@ def shopping_list_new_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -552,10 +570,10 @@ def shopping_list_new_from_default():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+
     default_list_id =  shopping_lists.get_default_list(user_id)
 
-    return render_template("shopping_list_new_from_default.html", username=username, default_list_id=default_list_id)
+    return render_template("shopping_list_new_from_default.html", default_list_id=default_list_id)
 
 
 @app.route("/shopping_list_new_from_default_save", methods=["post"])
@@ -565,7 +583,9 @@ def shopping_list_new_from_default_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Set scroll position to the beginning of the page
     session["scroll_pos"] = 0
@@ -594,7 +614,9 @@ def shopping_list_delete():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
     
     # Validate data
     try:

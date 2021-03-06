@@ -24,6 +24,7 @@
       <form action="/shopping_list_add_from_list_select_rows" method="post">
         <input type="hidden" name="list_add_from_id" value={{list_add_from_id}}>
         <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" value="Valitse kaikki rivit">
       </form>
     </td>
@@ -31,6 +32,7 @@
       <form action="/shopping_list_add_from_list_unselect_rows" method="post">
         <input type="hidden" name="list_add_from_id" value={{list_add_from_id}}>
         <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" value="Poista kaikkien rivien valinta">
       </form>
     </td>
@@ -44,6 +46,7 @@
 <form action="/shopping_list_add_from_list_save" method="post">
   <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
   <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 
   <table>
     <tr>

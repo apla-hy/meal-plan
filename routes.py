@@ -77,17 +77,25 @@ def profile():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     if request.method == "GET":
-        return render_template("profile.html",username=username)
+        return render_template("profile.html")
 
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+
+        # Check csrf
+        if session["csrf_token"] != request.form["csrf_token"]:
+            abort(403)
+
+        # Validate form data
+        try:
+            username = request.form["username"]
+            password = request.form["password"]
+            password_check = request.form["password_check"]
+        except:
+            return redirect("/error")
 
         # Check that passwords are the same
-        password_check = request.form["password_check"]
         if password != password_check:
             flash("Salasanat eivät ole samat")
             return redirect("/profile")
@@ -121,7 +129,6 @@ def item():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Store this page to the session history
     session["previous_page"] = "item"
@@ -132,7 +139,7 @@ def item():
         query = ''
     item_list = items.item_search(query)
 
-    return render_template("item.html", username=username, items=item_list, number_of_items=len(item_list))
+    return render_template("item.html", items=item_list, number_of_items=len(item_list))
 
 @app.route("/item_details/<int:id>", methods=["get"])
 def item_details(id):
@@ -141,7 +148,6 @@ def item_details(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     item_id = id
     item = items.get_item(item_id)
@@ -151,7 +157,7 @@ def item_details(id):
     item_class = item[3]
     class_list = items.get_class_names()
 
-    return render_template("item_details.html", username=username, item_id=item_id, item_name=item_name, item_class=item_class, \
+    return render_template("item_details.html", item_id=item_id, item_name=item_name, item_class=item_class, \
         class_list=class_list, number_of_classes=len(class_list))
 
 @app.route("/item_save", methods=["post"])
@@ -161,7 +167,9 @@ def item_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -185,6 +193,7 @@ def item_save():
 
     return redirect("/item_details/"+str(item_id))
 
+
 @app.route("/item_new", methods=["get"])
 def item_new():
 
@@ -192,11 +201,10 @@ def item_new():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     class_list = items.get_class_names()
 
-    return render_template("item_new.html", username=username, class_list=class_list, number_of_classes=len(class_list))
+    return render_template("item_new.html", class_list=class_list, number_of_classes=len(class_list))
 
 
 @app.route("/item_new_save", methods=["post"])
@@ -206,7 +214,9 @@ def item_new_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -239,7 +249,6 @@ def item_class():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     item_class_list = items.get_item_classes()
 
@@ -249,7 +258,7 @@ def item_class():
         row_ids.append(item_class[0])
         row_names.append(item_class[1])
 
-    return render_template("item_class.html", username=username, row_ids=row_ids, row_names=row_names, number_of_rows=len(row_ids))
+    return render_template("item_class.html", row_ids=row_ids, row_names=row_names, number_of_rows=len(row_ids))
 
 
 @app.route("/item_class_move_up/<int:id>", methods=["post"])
@@ -259,7 +268,9 @@ def item_class_move_up(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     items.item_class_move_up(id)
 
@@ -273,7 +284,9 @@ def item_class_move_down(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     items.item_class_move_down(id)
 
@@ -287,7 +300,9 @@ def item_class_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -324,7 +339,9 @@ def item_class_new():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:

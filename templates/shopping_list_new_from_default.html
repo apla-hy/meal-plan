@@ -19,6 +19,7 @@
 <br>
 
 <form action="/shopping_list_new_from_default_save" method="post">
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
   <table>
     <tr>
       <td>

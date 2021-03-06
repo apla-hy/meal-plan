@@ -23,6 +23,7 @@
     <td>
       <form action="/shopping_list_delete" method="post">
         <input type="hidden" name="list_id" value="{{ list_id }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" value="Poista lista">
       </form>
     </td>
@@ -34,6 +35,7 @@
 
 <form action="/shopping_list_add_from_list" method="post">
 <input type="hidden" name="list_add_to_id" value={{list_id}}>
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 <table>
   <tr>
     <td>
@@ -154,6 +156,7 @@
       <td>
         <input type="hidden" name="list_id" value={{list_id}}>
         <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" value="Tallenna">
         </form>
       </td>

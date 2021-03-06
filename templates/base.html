@@ -19,7 +19,7 @@
     <li><a href="/item">Nimikkeet</a></li>
     <li><a href="/item_class">Nimikeluokat</a></li>
     <li style="float:right"><a href="/logout">Kirjaudu ulos</a></li>
-    <li style="float:right"><a href="/profile">Omat tiedot - {{ username }}</a></li>
+    <li style="float:right"><a href="/profile">Omat tiedot - {{ session.username }}</a></li>
     {% else %}
     <li style="float:right"><a href="/login">Kirjaudu sisään</a></li>
     {% endif %}

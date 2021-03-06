@@ -11,7 +11,6 @@ def recipe():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Execute search (empty search query returns all lists)
     query = request.args.get("query")
@@ -19,7 +18,7 @@ def recipe():
         query = ''
     recipe_list = recipes.recipe_search(query)
 
-    return render_template("recipe.html",username=username, recipes=recipe_list, number_of_recipes=len(recipe_list))
+    return render_template("recipe.html", recipes=recipe_list, number_of_recipes=len(recipe_list))
 
 
 @app.route("/recipe_details/<int:id>", methods=["get"])
@@ -29,7 +28,6 @@ def recipe_details(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Check that recipe is not the default recipe (modification is not allowed)
     recipe_id = id
@@ -65,7 +63,7 @@ def recipe_details(id):
                 row_amounts[index] = recipe_row[2]
         del session["recipe_rows"]
 
-    return render_template("recipe_details.html", username=username, recipe_id=recipe_id, recipe_name=recipe_name, row_ids=row_ids, \
+    return render_template("recipe_details.html", recipe_id=recipe_id, recipe_name=recipe_name, row_ids=row_ids, \
         row_names=row_names, row_amounts=row_amounts, number_of_rows=len(row_ids), item_list=item_list, number_of_items=len(item_list))
 
 
@@ -76,7 +74,9 @@ def recipe_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate header data
     try:
@@ -132,7 +132,9 @@ def recipe_add_row():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -173,7 +175,9 @@ def recipe_delete_row(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -216,7 +220,6 @@ def item_new_from_recipe():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
     # Store recipe details page to the session history
     recipe_id = request.args.get("recipe_id")
@@ -235,7 +238,9 @@ def item_modify_from_recipe(id):
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:
@@ -268,9 +273,8 @@ def recipe_new():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
 
-    return render_template("recipe_new.html", username=username)
+    return render_template("recipe_new.html")
 
 @app.route("/recipe_new_save", methods=["post"])
 def recipe_new_save():
@@ -279,7 +283,9 @@ def recipe_new_save():
     user_id = users.get_user_id()
     if not user_id:
         return redirect("/")
-    username = users.get_username()
+    # Check csrf
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
 
     # Validate form data
     try:

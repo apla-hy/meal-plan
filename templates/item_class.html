@@ -24,6 +24,7 @@
       <form action="/item_class_new" method="post">
         <label>Uuden nimikeluokan nimi: </label>
         <input type="text" name="item_class_new_name" value="">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="submit" value="Lisää uusi nimikeluokka">
       </form>
     </td>
@@ -61,6 +62,7 @@
 <br>
 
 <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 <input type="submit" value="Tallenna">
 
 </form>
