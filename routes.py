@@ -350,6 +350,10 @@ def item_class_new():
         return redirect("/error")
     if len(class_name) > 50:
         flash("Luokan nimi on liian pitkä")
+    number_of_classes = items.get_class_names()
+    if len(number_of_classes) > 99:
+        flash("Luokan lisäys ei onnistunut. Luokkia voi olla enintään 100")
+        return redirect("/item_class")
 
     # Add new item class
     if items.new_class(class_name):

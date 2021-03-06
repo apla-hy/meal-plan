@@ -140,17 +140,21 @@ def recipe_add_row():
     try:
         recipe_id = int(request.form["recipe_id"])
         recipe_name = request.form["recipe_name"]
+        number_of_rows = int(request.form["number_of_rows"])
     except:
         return redirect("/error")
     if len(recipe_name) > 50:
         flash("Reseptin nimi on liian pitkä")
+        return redirect("/recipe_details/"+str(recipe_id))
+    if number_of_rows > 99:
+        flash("Rivin lisäys ei onnistunut. Rivejä voi olla enintään 100.")
         return redirect("/recipe_details/"+str(recipe_id))
 
     # Store form data to session (needed if form data is not saved before calling this action)
     if not recipe_id == recipes.get_default_recipe_id():
         session["recipe_name"] = recipe_name
     recipe_rows = []
-    for i in range(int(request.form["number_of_rows"])):
+    for i in range(number_of_rows):
         try:
             row_id = request.form[str(i) + "_row_id"]
             item_name = request.form[str(i) + "_row_name"]

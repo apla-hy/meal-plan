@@ -224,6 +224,9 @@ def shopping_list_add_row():
         number_of_rows = int(request.form["number_of_rows"])
     except:
         return redirect("/error")
+    if number_of_rows > 299:
+        flash("Lisäys ei onnistunut. Rivejä voi olla enintään 300.")
+        return redirect("/shopping_list_details/"+str(list_id))
 
     # Store form data to session (needed if form data is not saved before calling this action)
     if not list_id == shopping_lists.get_default_list(user_id):

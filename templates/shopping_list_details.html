@@ -33,6 +33,7 @@
 
 <br>
 
+{% if saved_lists | length > 1 or (saved_lists | length == 1 and saved_lists[0][0] != list_id) %}
 <form action="/shopping_list_add_from_list" method="post">
 <input type="hidden" name="list_add_to_id" value={{list_id}}>
 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -56,6 +57,7 @@
   </tr>
 </table>
 </form>
+{% endif %}
 
 <br>
 
