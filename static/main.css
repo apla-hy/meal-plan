@@ -61,12 +61,16 @@ li {
   overflow-x: auto;
 }
 
+.plan_period {
+  max-width: 50px;
+}
+
 .plan_table_input_recipe {
-  width: 200px;
+  max-width: 170px;
 }
 
 .plan_table_input_notes {
-  width: 250px;
+  max-width: 200px;
 }
 
 /* input fields */

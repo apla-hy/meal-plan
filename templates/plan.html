@@ -20,7 +20,7 @@
     <td>
       <form action="/plan_change_period" method="post">
         <label>Suunnittelujakso</label>
-        <input type="number" name="period" value={{ period }}>
+        <input type="number" class="plan_period" name="period" value={{ period }}>
         <input type="submit" class="button" value="Vaihda suunnittelujakso">
         <input type="hidden" name="plan_id" value="{{ plan_id }}">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
