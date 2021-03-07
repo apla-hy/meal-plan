@@ -53,13 +53,13 @@ def register():
             return redirect("/register")
 
         # Check password length
-        if len(password) < 4:
-            flash("Salasana on liian lyhyt")
+        if len(password) < 8:
+            flash("Salasana on liian lyhyt. Salasanassa pitää olla vähintään 8 merkkiä.")
             return redirect("/register")
 
        # Check username length
         if len(username) < 4:
-            flash("Käyttäjätunnus on liian lyhyt")
+            flash("Käyttäjätunnus on liian lyhyt. Käyttäjätunnuksessa pitää olla vähintään 4 merkkiä.")
             return redirect("/register")
 
         # Register user
@@ -101,13 +101,13 @@ def profile():
             return redirect("/profile")
 
         # Check password length
-        if len(password) < 4:
-            flash("Salasana on liian lyhyt")
+        if len(password) < 8:
+            flash("Salasana on liian lyhyt. Salasanassa pitää olla vähintään 8 merkkiä.")
             return redirect("/profile")
 
        # Check username length
         if len(username) < 4:
-            flash("Käyttäjätunnus on liian lyhyt")
+            flash("Käyttäjätunnus on liian lyhyt. Käyttäjätunnuksessa pitää olla vähintään 4 merkkiä.")
             return redirect("/register")
 
         # Save profile data

@@ -21,23 +21,32 @@ Sovelluksen keskeiset toiminnallisuudet ovat:
 * Reseptien ylläpito
 * Nimikkeiden ylläpito
 
-## Sovelluksen tilanne - lopullinen palautus
+## Käyttöohjeet
 
-Suunniteltu toiminnallisuus on toteutettu. Sovelluksessa on kuitenkin myös kehitystarpeita:
-* Ulkoasu ja käytettävyys
-	* Ulkoasu ei ole erityisen hyvä, koska sitä ei ollut aikaa viimeistellä
-	* Käytettävyys pienellä ruudulla ei ole erityisen hyvä
-	* Tuki kaikille yleisille laitteille ja selaimille
-		* Eri laitteita ja selaimia on testattu jonkin verran mutta ei kattavasti
-		* Html datalist ei toimi kuten pitäisi kaikilla mobiiliselaimilla. Esimerkiksi Androidissa Firefox-selaimessa, lista ei tule näkyviin mutta Chrome-selaimessa lista tulee näkyviin.
-* Käyttäjähallinta
-	* Suunnitelmat ja ostoslistat ovat käyttäjäkohtaisia. Nimikkeet, luokat ja reseptit ovat yhteisiä. Tämä helpottaa sovelluksen käytön aloitusta eli uuden käyttäjän ei tarvitse luoda tyhjästä nimikeluokkia, nimikkeitä ja reseptejä. Muutokset yhteisiin tietoihin kuitenkin vaikuttavat muiden käyttäjien ympäristöön. Tarkoitus on kehittää käyttäjähallintaa siten, että aloitus on helppoa mutta tiedot kuitenkin käyttäjäkohtaisia. Aika ei riittänyt tämän toteutukseen kurssin aikana. Osana tätä toteutusta on tarkoitus myös mahdollistaa nimikeluokkien, nimikkeiden ja reseptien poisto/piilotus.
+Kirjautumisen jälkeen sovellus avautuu suunnittelunäkymään. Eri päiville ja aterioille valitaan valmistettava ateria eli resepti. Valintalistalla olevat rivit, joiden lopussa on teksti '(valmis)' tarkoittavat, että aterialla syödään aikaisemmin valmistettua ruokaa. Näitä valintoja ei oteta huomioon ostoslistan luonnissa. Reseptin valinnan sijasta kenttiin voi myös kirjoittaa vapaamuotoisia muistiinpanoja.
+
+Suunnitelunäkymän aikaväliä voi mukauttaa muuttamalla aloituspäivää ja suunnittelujaksoa. Kun suunnitelma on valmis, painamalla napista 'Luo ostoslista', sovellus luo uuden ostoslistan valittujen reseptien perusteella ja näyttää sen. Ostoslistaa voi muokata ja siihen voi lisätä rivejä nimellä tallennetuilta ostoslistoilta.
+
+Valmiin ostoslistan rivejä voi merkitä ostetuiksi painamalla ostoslistan rivin vasemmassa laidassa olevaa merkintänappia.
+
+Ruudun ylälaidan valikosta voi siirtyä ylläpitämään reseptejä, nimikkeitä ja nimikeluokkia. Nimikkeiden muokkaus onnistuu myös ostoslistan ja reseptien rivien oikeassa laidassa olevien muokkausnappien kautta.
 
 ## Sovelluksen testaus
 
 Sovelluksen testaaminen onnistuu [Herokussa](https://ruokasuunnittelu.herokuapp.com/).
 
-Helpointa on käyttää valmiiksi luotua käyttäjätunnusta *user*, jonka salasana on *user*. Sovellukseen voi myös luoda uuden käyttäjätunnuksen ja testata toiminnallisuutta sillä.
+Helpointa on käyttää valmiiksi luotua käyttäjätunnusta *user1*, jonka salasana on *password1*. Sovellukseen voi myös luoda uuden käyttäjätunnuksen ja testata toiminnallisuutta sillä.
+
+## Sovelluksen tilanne - lopullinen palautus
+
+Suunniteltu toiminnallisuus on toteutettu. Sovelluksessa on kuitenkin myös kehitystarpeita:
+* Ulkoasu ja käytettävyys
+	* Käytettävyyttä pienellä ruudulla olisi hyvä vielä parantaa
+	* Tuki kaikille yleisille laitteille ja selaimille
+		* Eri laitteita ja selaimia on testattu jonkin verran mutta ei kattavasti
+		* Html datalist ei toimi kuten pitäisi kaikilla mobiiliselaimilla. Esimerkiksi Androidissa Firefox-selaimessa, valintalista ei tule näkyviin mutta Chrome-selaimessa lista toimii.
+* Käyttäjähallinta
+	* Suunnitelmat ja ostoslistat ovat käyttäjäkohtaisia. Nimikkeet, nimikeluokat ja reseptit ovat yhteisiä. Tämä helpottaa sovelluksen käytön aloitusta eli uuden käyttäjän ei tarvitse luoda tyhjästä nimikeluokkia, nimikkeitä ja reseptejä. Muutokset yhteisiin tietoihin kuitenkin vaikuttavat muiden käyttäjien ympäristöön. Tarkoitus on kehittää käyttäjähallintaa siten, että aloitus on edelleen helppoa mutta tiedot kuitenkin käyttäjäkohtaisia. Aika ei riittänyt tämän toteutukseen kurssin aikana. Osana tätä toteutusta on tarkoitus myös mahdollistaa nimikeluokkien, nimikkeiden ja reseptien poisto tai piilotus.
 
 ## Tietokannan rakenne
 
