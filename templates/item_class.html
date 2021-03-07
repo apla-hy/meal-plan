@@ -10,7 +10,7 @@
   <tr>
     <td>
       <form action="/" method="get">
-        <input type="submit" value="Palaa etusivulle">
+        <input type="submit" class="button" value="Palaa etusivulle">
       </form>
     </td>
   </tr>
@@ -25,7 +25,7 @@
         <label>Uuden nimikeluokan nimi: </label>
         <input type="text" name="item_class_new_name" value="">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" value="Lisää uusi nimikeluokka">
+        <input type="submit" class="button" value="Lisää uusi nimikeluokka">
       </form>
     </td>
   </tr>
@@ -63,7 +63,7 @@
 
 <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-<input type="submit" value="Tallenna">
+<input type="submit" class="button" value="Tallenna">
 
 </form>
 

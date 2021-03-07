@@ -10,21 +10,21 @@
   <tr>
     <td>
       <form action="/shopping_list" method="get">
-        <input type="submit" value="Näytä tallennetut ostoslistat">
+        <input type="submit" class="button" value="Näytä tallennetut ostoslistat">
       </form>
     </td>
     {% if default_list == True %}
     <td>
       <form action="/shopping_list_new_from_default" method="get">
-        <input type="submit" value="Tallenna ostoslista nimellä">
+        <input type="submit" class="button" value="Tallenna ostoslista nimellä">
       </form>
     </td>
     {% else %}
     <td>
-      <form action="/shopping_list_delete" method="post">
+      <form onSubmit="return confirm('Poistetaanko ostoslista?')" action="/shopping_list_delete" method="post">
         <input type="hidden" name="list_id" value="{{ list_id }}">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" value="Poista lista">
+        <input type="submit" class="button" value="Poista lista">
       </form>
     </td>
     {% endif %}
@@ -52,7 +52,7 @@
       </select>
     </td>
     <td>
-      <input type="submit" value="Lisää nimikkeitä valitulta listalta">
+      <input type="submit" class="button" value="Lisää nimikkeitä valitulta listalta">
     </td>
   </tr>
 </table>
@@ -64,12 +64,12 @@
 <table>
   <tr>
     <td>
-      <input type="submit" value="Lisää rivi" form="form_main" formaction="/shopping_list_add_row" >
+      <input type="submit" class="button" value="Lisää rivi" form="form_main" formaction="/shopping_list_add_row" >
     </td>
     <td>
       <form action="/item_new_from_shopping_list" method="get">
         <input type="hidden" name="list_id" value="{{ list_id }}">
-        <input type="submit" value="Lisää uusi nimike">
+        <input type="submit" class="button" value="Lisää uusi nimike">
       </form>
     </td>
   </tr>
@@ -159,12 +159,12 @@
         <input type="hidden" name="list_id" value={{list_id}}>
         <input type="hidden" name="number_of_rows" value={{number_of_rows}}>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" value="Tallenna">
+        <input type="submit" class="button" value="Tallenna">
         </form>
       </td>
       <td>
         <form action="/shopping_list_details/{{list_id}}" method="get">
-          <input type="submit" value="Peru tallentamattomat muutokset">
+          <input type="submit" class="button" value="Peru tallentamattomat muutokset">
         </form>
       </td>
     </tr>

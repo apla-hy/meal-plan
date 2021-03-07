@@ -12,16 +12,16 @@
 
 <nav>
   <ul>
-    <li><a href="/">Ruokasuunnittelu</a></li>
+    <li><a class="menubar" href="/">Ruokasuunnittelu</a></li>
     {% if session.user_id %}
-    <li><a href="/shopping_list">Tallennetut ostoslistat</a></li>
-    <li><a href="/recipe">Reseptit</a></li>
-    <li><a href="/item">Nimikkeet</a></li>
-    <li><a href="/item_class">Nimikeluokat</a></li>
-    <li style="float:right"><a href="/logout">Kirjaudu ulos</a></li>
-    <li style="float:right"><a href="/profile">Omat tiedot - {{ session.username }}</a></li>
+    <li><a class="menubar" href="/shopping_list">Tallennetut ostoslistat</a></li>
+    <li><a class="menubar" href="/recipe">Reseptit</a></li>
+    <li><a class="menubar" href="/item">Nimikkeet</a></li>
+    <li><a class="menubar" href="/item_class">Nimikeluokat</a></li>
+    <li style="float:right"><a class="menubar" href="/logout">Kirjaudu ulos</a></li>
+    <li style="float:right"><a class="menubar" href="/profile">Omat tiedot - {{ session.username }}</a></li>
     {% else %}
-    <li style="float:right"><a href="/login">Kirjaudu sisään</a></li>
+    <li style="float:right"><a class="menubar" href="/login">Kirjaudu sisään</a></li>
     {% endif %}
   </ul>
 </nav>

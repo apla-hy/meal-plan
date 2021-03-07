@@ -12,17 +12,17 @@
       <form action="/shopping_list" method="get">
         <label>Hae ostoslistoja</label>
         <input type="text" name="query">
-        <input type="submit" value="Hae">
+        <input type="submit" class="button" value="Hae">
       </form>
     </td>
     <td>
       <form action="/shopping_list" method="get">
-        <input type="submit" value="Näytä kaikki">
+        <input type="submit" class="button" value="Näytä kaikki">
       </form>
     </td>
     <td>
       <form action="/shopping_list_new" method="get">
-        <input type="submit" value="Lisää uusi ostoslista">
+        <input type="submit" class="button" value="Lisää uusi ostoslista">
       </form>
     </td>
   </tr>
@@ -32,12 +32,12 @@
 
 <table>
   <tr>
-    <th>Ostoslistan nimi</th>
+    <th><label class="link_list_header">Ostoslistan nimi</label></th>
   </tr>
 
 {% for i in range(number_of_lists) %}
 <tr>
-<td><a href="/shopping_list_details/{{ lists[i][0] }}">{{ lists[i][1] }}</a></td>
+<td><a class="link_list" href="/shopping_list_details/{{ lists[i][0] }}">{{ lists[i][1] }}</a></td>
 </tr>
 {% endfor %}
 </table>

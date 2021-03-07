@@ -12,17 +12,17 @@
 <form action="/recipe" method="get">
 <label>Hae reseptejä</label>
 <input type="text" name="query">
-<input type="submit" value="Hae">
+<input type="submit" class="button" value="Hae">
 </form>
 </td>
 <td>
   <form action="/recipe" method="get">
-    <input type="submit" value="Näytä kaikki">
+    <input type="submit" class="button" value="Näytä kaikki">
   </form>
 </td>
 <td>
 <form action="/recipe_new" method="get">
-<input type="submit" value="Lisää uusi resepti">
+<input type="submit" class="button" value="Lisää uusi resepti">
 </td>
 </form>
 
@@ -33,14 +33,13 @@
 
 <table>
   <tr>
-    <th>Resepti</th>
+    <th><label class="link_list_header" >Resepti</label></th>
   </tr>
-
-{% for i in range(number_of_recipes) %}
-<tr>
-<td><a href="/recipe_details/{{ recipes[i][0] }}">{{ recipes[i][1] }}</a></td>
-</tr>
-{% endfor %}
+  {% for i in range(number_of_recipes) %}
+  <tr>
+    <td><a class="link_list" href="/recipe_details/{{ recipes[i][0] }}">{{ recipes[i][1] }}</a></td>
+  </tr>
+  {% endfor %}
 </table>
 
 <br>

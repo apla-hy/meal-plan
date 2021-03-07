@@ -12,7 +12,7 @@
       <form action="/plan_change_date" method="post">
         <label>Aloituspäivä</label>
         <input type="date" name="startdate" value={{ startdate }}>
-        <input type="submit" value="Vaihda aloituspäivä">
+        <input type="submit" class="button" value="Vaihda aloituspäivä">
         <input type="hidden" name="plan_id" value="{{ plan_id }}">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       </form>
@@ -21,7 +21,7 @@
       <form action="/plan_change_period" method="post">
         <label>Suunnittelujakso</label>
         <input type="number" name="period" value={{ period }}>
-        <input type="submit" value="Vaihda suunnittelujakso">
+        <input type="submit" class="button" value="Vaihda suunnittelujakso">
         <input type="hidden" name="plan_id" value="{{ plan_id }}">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       </form>
@@ -39,7 +39,7 @@
 
 <form name=form_rows action="/plan_save_rows" method="post">
 
-<div style="overflow-x:auto;">
+<div class="plan_table">
 <table>
   <tr>
     <th>Päivä</th>
@@ -56,9 +56,9 @@
 <td>{{ dates[i] }}</td>
 <td>{{ weekdays[i] }}</td>
 {% for j in range(3) %}
-<td><input type="text" name="{{ i }}_{{ j }}" list="recipes" value="{{ selected_recipes[i][j] }}" /></td>
+<td><input class="plan_table_input_recipe" type="text" name="{{ i }}_{{ j }}" list="recipes" value="{{ selected_recipes[i][j] }}" /></td>
 {% endfor %}
-<td><input type="text" name="{{ i }}_notes" value="{{ notes[i] }}" /></td>
+<td><input type="text" class="plan_table_input_notes" name="{{ i }}_notes" value="{{ notes[i] }}" /></td>
 <tr>
 {% endfor %}
 </table>
@@ -71,14 +71,14 @@
     <td>
       <input type="hidden" name="plan_id" value="{{ plan_id }}">
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-      <input type="submit" value="Tallenna suunnitelma">
-      <button type="submit" formaction="/plan_create_shopping_list">Luo ostoslista</button>
+      <input type="submit" class="button" value="Tallenna suunnitelma">
+      <button type="submit" class="button" formaction="/plan_create_shopping_list">Luo ostoslista</button>
       </form>
     </td>
     <td>
       <form action="/plan_show_default_shopping_list" method="post">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" value="Näytä viimeisin luotu ostoslista">
+        <input type="submit" class="button" value="Näytä viimeisin luotu ostoslista">
       </form>  
     </td>
   </tr>
