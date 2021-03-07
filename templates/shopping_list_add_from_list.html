@@ -10,7 +10,7 @@
   <tr>
     <td>
       <form action="/shopping_list_details/{{list_add_to_id}}" method="get">
-        <input type="submit" value="Takaisin">
+        <input type="submit" class="button" value="Takaisin">
       </form>
     </td>
   </tr>
@@ -25,7 +25,7 @@
         <input type="hidden" name="list_add_from_id" value={{list_add_from_id}}>
         <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" value="Valitse kaikki rivit">
+        <input type="submit" class="button" value="Valitse kaikki rivit">
       </form>
     </td>
     <td>
@@ -33,7 +33,7 @@
         <input type="hidden" name="list_add_from_id" value={{list_add_from_id}}>
         <input type="hidden" name="list_add_to_id" value={{list_add_to_id}}>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <input type="submit" value="Poista kaikkien rivien valinta">
+        <input type="submit" class="button" value="Poista kaikkien rivien valinta">
       </form>
     </td>
 
@@ -89,7 +89,7 @@
     {% endfor %}
   </table>
   <br>
-  <input type="submit" value="Lisää valitut rivit">
+  <input type="submit" class="button" value="Lisää valitut rivit">
 </form>
   
 

@@ -453,12 +453,15 @@ def shopping_list_add_from_list_save():
     if len(item_list) != 0:
         # Add rows to the target shopping list
         list_rows = shopping_lists.add_items_from_list(list_id, item_list)
-    
+        if not list_rows:
+            flash("Rivien lisäys ei onnistunut. Ostoslistalla voi olla enintään 300 riviä.")
+            return redirect("/shopping_list_details/"+str(list_id))
+
         # Save the new version of the shopping list to the database
         if shopping_lists.save_list_rows(list_id, list_rows):
             flash("Rivit lisätty")
         else:
-            flash("Valittujen rivien lisäämisessä tapahtui virhe")
+            flash("Rivien lisäys ei onnistunut")
 
     return redirect("/shopping_list_details/"+str(list_id))
 

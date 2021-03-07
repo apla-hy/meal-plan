@@ -93,6 +93,10 @@ def add_items_from_list(list_id, item_list):
     for item in item_list:
         shopping_list_rows.append([item[0], item[1], 0])
 
+    # Check number of row limit
+    if len(shopping_list_rows) > 299:
+        return False
+
     # Combine same items to one row
     shopping_list_combined = remove_duplicate_rows(shopping_list_rows)
 
